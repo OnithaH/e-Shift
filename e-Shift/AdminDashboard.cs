@@ -134,13 +134,19 @@ namespace e_Shift
 
         private void btnJobManagement_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Job Management form will be created later!\n\n" +
-                          "This will allow you to:\n" +
-                          "• View all transport jobs\n" +
-                          "• Approve/Decline job requests\n" +
-                          "• Assign transport units\n" +
-                          "• Track job progress",
-                          "Coming Soon", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                // Open Admin Job Management form
+                AdminJobManagementForm jobManagementForm = new AdminJobManagementForm();
+                jobManagementForm.ShowDialog();
+
+                // Refresh dashboard statistics after job management
+                LoadDashboardData();
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error opening job management: {ex.Message}", true);
+            }
         }
 
         private void btnTransportManagement_Click(object sender, EventArgs e)

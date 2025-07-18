@@ -201,6 +201,8 @@ namespace e_Shift
 
                         byte[] storedPasswordHash = (byte[])reader["Password"];
 
+                        // Replace the customer authentication success section in LoginForm.cs with this:
+
                         if (VerifyPasswordSimple(password, storedPasswordHash))
                         {
                             // Create user session
@@ -221,23 +223,14 @@ namespace e_Shift
                             string fullName = UserSession.GetFullName();
                             ShowMessage($"Login successful! Welcome {fullName}", false);
 
-                            // Show temporary success message (will be replaced with CustomerDashboard)
-                            MessageBox.Show($"✅ Customer Login Successful!\n\n" +
-                                          $"Welcome: {fullName}\n" +
-                                          $"Customer Number: {UserSession.Username}\n" +
-                                          $"Login Time: {UserSession.LoginTime:HH:mm:ss}\n\n" +
-                                          $"Note: Customer Dashboard will be created next!",
-                                          "Login Success",
-                                          MessageBoxButtons.OK,
-                                          MessageBoxIcon.Information);
+                            // Small delay to show success message
+                            Application.DoEvents();
+                            System.Threading.Thread.Sleep(500);
 
-                            // TODO: Replace this with CustomerDashboard navigation
-                            // CustomerDashboard customerDashboard = new CustomerDashboard();
-                            // customerDashboard.Show();
-                            // this.Hide();
-
-                            // For now, just clear the form
-                            ClearForm();
+                            // Open CustomerDashboard
+                            CustomerDashboard customerDashboard = new CustomerDashboard();
+                            customerDashboard.Show();
+                            this.Hide();
                         }
                         else
                         {
