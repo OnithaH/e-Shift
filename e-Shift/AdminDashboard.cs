@@ -123,13 +123,16 @@ namespace e_Shift
 
         private void btnProductManagement_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Product Management form will be created next!\n\n" +
-                          "This will allow you to:\n" +
-                          "• View all products\n" +
-                          "• Add new products\n" +
-                          "• Edit product details\n" +
-                          "• Set pricing and categories",
-                          "Coming Soon", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                // Open Product Management form
+                ProductManagementForm productManagementForm = new ProductManagementForm();
+                productManagementForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error opening product management: {ex.Message}", true);
+            }
         }
 
         private void btnJobManagement_Click(object sender, EventArgs e)
