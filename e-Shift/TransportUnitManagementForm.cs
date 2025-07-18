@@ -291,7 +291,7 @@ namespace e_Shift
                         numLoadCapacity.Value = Convert.ToDecimal(reader["LoadCapacity"]);
                         numVolumeCapacity.Value = Convert.ToDecimal(reader["VolumeCapacity"]);
                         cmbFuelType.Text = reader["FuelType"].ToString();
-                        dtpLastMaintenance.Value = Convert.ToDateTime(reader["LastMaintenanceDate"]);
+                        dtpLastMaintenance.Value = Convert.ToDateTime(reader["LastMaintenance"] ?? DateTime.Now);
                         cmbStatusLorry.Text = reader["Status"].ToString();
                         chkIsAvailableLorry.Checked = Convert.ToBoolean(reader["IsAvailable"]);
                     }
@@ -899,10 +899,39 @@ namespace e_Shift
         {
             if (ValidateDriverData())
             {
-                ShowMessage("Driver added successfully!", false);
-                LoadDrivers();
-                LoadComboBoxData();
-                ClearDriverForm();
+                try
+                {
+                    string query = @"INSERT INTO Drivers (LicenseNumber, FirstName, LastName, Phone, Email, Address, LicenseExpiry, LicenseClass, HourlyRate, IsAvailable, CreatedDate, ModifiedDate) 
+                   VALUES (@LicenseNumber, @FirstName, @LastName, @Phone, @Email, @Address, @LicenseExpiry, @LicenseClass, @HourlyRate, @IsAvailable, @CreatedDate, @ModifiedDate)";
+
+                    SqlParameter[] parameters = {
+                new SqlParameter("@LicenseNumber", txtLicenseNumber.Text.Trim()),
+                new SqlParameter("@FirstName", txtFirstNameDriver.Text.Trim()),
+                new SqlParameter("@LastName", txtLastNameDriver.Text.Trim()),
+                new SqlParameter("@Phone", txtPhoneDriver.Text.Trim()),
+                new SqlParameter("@Email", txtEmailDriver.Text.Trim()),
+                new SqlParameter("@Address", txtAddressDriver.Text.Trim()),
+                new SqlParameter("@LicenseExpiry", dtpLicenseExpiry.Value),
+                new SqlParameter("@LicenseClass", cmbLicenseClass.Text),
+                new SqlParameter("@HourlyRate", numHourlyRateDriver.Value),
+                new SqlParameter("@IsAvailable", chkIsAvailableDriver.Checked),
+                new SqlParameter("@CreatedDate", DateTime.Now),
+                new SqlParameter("@ModifiedDate", DateTime.Now)
+            };
+
+                    int result = DatabaseConnection.ExecuteNonQuery(query, parameters);
+                    if (result > 0)
+                    {
+                        ShowMessage("Driver added successfully!", false);
+                        LoadDrivers();
+                        LoadComboBoxData();
+                        ClearDriverForm();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ShowMessage($"Error adding driver: {ex.Message}", true);
+                }
             }
         }
 
