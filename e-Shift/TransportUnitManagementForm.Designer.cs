@@ -1622,6 +1622,9 @@
             this.btnDeleteContainer.Click += new System.EventHandler(this.btnDeleteContainer_Click);
 
 
+
+
+
             // ==========================================
             // ASSISTANTS TAB - DETAIL FORM INITIALIZATION
             // ==========================================
@@ -1984,7 +1987,5 @@
         private System.Windows.Forms.Button btnUpdateContainer;
         private System.Windows.Forms.Button btnDeleteContainer;
 
-        private System.Windows.Forms.Label lblSearch;
-        private System.Windows.Forms.TextBox txtSearch;
     }
 }

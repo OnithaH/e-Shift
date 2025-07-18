@@ -284,16 +284,44 @@ namespace e_Shift
                 {
                     if (reader != null && reader.Read())
                     {
-                        txtRegistrationNumber.Text = reader["RegistrationNumber"].ToString();
-                        txtMake.Text = reader["Make"].ToString();
-                        txtModel.Text = reader["Model"].ToString();
-                        numYear.Value = Convert.ToDecimal(reader["Year"]);
-                        numLoadCapacity.Value = Convert.ToDecimal(reader["LoadCapacity"]);
-                        numVolumeCapacity.Value = Convert.ToDecimal(reader["VolumeCapacity"]);
-                        cmbFuelType.Text = reader["FuelType"].ToString();
-                        dtpLastMaintenance.Value = Convert.ToDateTime(reader["LastMaintenance"] ?? DateTime.Now);
-                        cmbStatusLorry.Text = reader["Status"].ToString();
-                        chkIsAvailableLorry.Checked = Convert.ToBoolean(reader["IsAvailable"]);
+                        // Handle potential null values with proper checking
+                        txtRegistrationNumber.Text = reader["RegistrationNumber"]?.ToString() ?? "";
+                        txtMake.Text = reader["Make"]?.ToString() ?? "";
+                        txtModel.Text = reader["Model"]?.ToString() ?? "";
+
+                        // Safe conversion for Year
+                        if (reader["Year"] != DBNull.Value)
+                            numYear.Value = Convert.ToDecimal(reader["Year"]);
+                        else
+                            numYear.Value = DateTime.Now.Year;
+
+                        // Safe conversion for LoadCapacity
+                        if (reader["LoadCapacity"] != DBNull.Value)
+                            numLoadCapacity.Value = Convert.ToDecimal(reader["LoadCapacity"]);
+                        else
+                            numLoadCapacity.Value = 0;
+
+                        // Safe conversion for VolumeCapacity
+                        if (reader["VolumeCapacity"] != DBNull.Value)
+                            numVolumeCapacity.Value = Convert.ToDecimal(reader["VolumeCapacity"]);
+                        else
+                            numVolumeCapacity.Value = 0;
+
+                        cmbFuelType.Text = reader["FuelType"]?.ToString() ?? "Diesel";
+
+                        // Safe conversion for LastMaintenance
+                        if (reader["LastMaintenance"] != DBNull.Value)
+                            dtpLastMaintenance.Value = Convert.ToDateTime(reader["LastMaintenance"]);
+                        else
+                            dtpLastMaintenance.Value = DateTime.Now.AddMonths(-6); // Default to 6 months ago
+
+                        cmbStatusLorry.Text = reader["Status"]?.ToString() ?? "Available";
+
+                        // Safe conversion for IsAvailable
+                        if (reader["IsAvailable"] != DBNull.Value)
+                            chkIsAvailableLorry.Checked = Convert.ToBoolean(reader["IsAvailable"]);
+                        else
+                            chkIsAvailableLorry.Checked = true;
                     }
                 }
             }
@@ -356,12 +384,15 @@ namespace e_Shift
         }
         #endregion
 
-        #region Drivers Management
+        #region Drivers Management 
+
         private void LoadDrivers()
         {
             try
             {
-                string query = @"SELECT DriverID, LicenseNumber, FirstName, LastName, Phone, Email, LicenseExpiry, LicenseClass, HourlyRate, IsAvailable FROM Drivers WHERE IsDeleted = 0 ORDER BY FirstName, LastName";
+                string query = @"SELECT DriverID, LicenseNumber, FirstName, LastName, Phone, Email, Address, 
+                        LicenseExpiry, LicenseClass, HourlyRate, IsAvailable 
+                        FROM Drivers WHERE IsDeleted = 0 ORDER BY FirstName, LastName";
                 DataTable dataTable = DatabaseConnection.FillDataTable(query);
                 if (dataTable != null)
                 {
@@ -386,6 +417,12 @@ namespace e_Shift
                 dgvDrivers.Columns["LicenseExpiry"].HeaderText = "License Exp.";
                 dgvDrivers.Columns["LicenseClass"].HeaderText = "Class";
                 dgvDrivers.Columns["HourlyRate"].HeaderText = "Rate";
+
+                // Format columns
+                if (dgvDrivers.Columns["HourlyRate"] != null)
+                    dgvDrivers.Columns["HourlyRate"].DefaultCellStyle.Format = "C2"; // Currency format
+                if (dgvDrivers.Columns["LicenseExpiry"] != null)
+                    dgvDrivers.Columns["LicenseExpiry"].DefaultCellStyle.Format = "yyyy-MM-dd";
             }
         }
 
@@ -393,23 +430,40 @@ namespace e_Shift
         {
             try
             {
-                string query = @"SELECT * FROM Drivers WHERE DriverID = @DriverID";
+                string query = @"SELECT * FROM Drivers WHERE DriverID = @DriverID AND IsDeleted = 0";
                 SqlParameter[] parameters = { new SqlParameter("@DriverID", driverID) };
 
                 using (SqlDataReader reader = DatabaseConnection.ExecuteReader(query, parameters))
                 {
                     if (reader != null && reader.Read())
                     {
-                        txtLicenseNumber.Text = reader["LicenseNumber"].ToString();
-                        txtFirstNameDriver.Text = reader["FirstName"].ToString();
-                        txtLastNameDriver.Text = reader["LastName"].ToString();
-                        txtPhoneDriver.Text = reader["Phone"].ToString();
-                        txtEmailDriver.Text = reader["Email"].ToString();
-                        txtAddressDriver.Text = reader["Address"].ToString();
-                        dtpLicenseExpiry.Value = Convert.ToDateTime(reader["LicenseExpiry"]);
-                        cmbLicenseClass.Text = reader["LicenseClass"].ToString();
-                        numHourlyRateDriver.Value = Convert.ToDecimal(reader["HourlyRate"]);
-                        chkIsAvailableDriver.Checked = Convert.ToBoolean(reader["IsAvailable"]);
+                        // Handle potential null values with proper checking
+                        txtLicenseNumber.Text = reader["LicenseNumber"]?.ToString() ?? "";
+                        txtFirstNameDriver.Text = reader["FirstName"]?.ToString() ?? "";
+                        txtLastNameDriver.Text = reader["LastName"]?.ToString() ?? "";
+                        txtPhoneDriver.Text = reader["Phone"]?.ToString() ?? "";
+                        txtEmailDriver.Text = reader["Email"]?.ToString() ?? "";
+                        txtAddressDriver.Text = reader["Address"]?.ToString() ?? "";
+
+                        // Safe conversion for LicenseExpiry
+                        if (reader["LicenseExpiry"] != DBNull.Value)
+                            dtpLicenseExpiry.Value = Convert.ToDateTime(reader["LicenseExpiry"]);
+                        else
+                            dtpLicenseExpiry.Value = DateTime.Now.AddYears(1); // Default to 1 year from now
+
+                        cmbLicenseClass.Text = reader["LicenseClass"]?.ToString() ?? "Light";
+
+                        // Safe conversion for HourlyRate
+                        if (reader["HourlyRate"] != DBNull.Value)
+                            numHourlyRateDriver.Value = Convert.ToDecimal(reader["HourlyRate"]);
+                        else
+                            numHourlyRateDriver.Value = 1000; // Default rate
+
+                        // Safe conversion for IsAvailable
+                        if (reader["IsAvailable"] != DBNull.Value)
+                            chkIsAvailableDriver.Checked = Convert.ToBoolean(reader["IsAvailable"]);
+                        else
+                            chkIsAvailableDriver.Checked = true;
                     }
                 }
             }
@@ -430,7 +484,7 @@ namespace e_Shift
             txtAddressDriver.Clear();
             dtpLicenseExpiry.Value = DateTime.Now.AddYears(1);
             cmbLicenseClass.SelectedIndex = -1;
-            numHourlyRateDriver.Value = 0;
+            numHourlyRateDriver.Value = 1000;
             chkIsAvailableDriver.Checked = true;
         }
 
@@ -442,24 +496,49 @@ namespace e_Shift
                 txtLicenseNumber.Focus();
                 return false;
             }
+
             if (string.IsNullOrWhiteSpace(txtFirstNameDriver.Text))
             {
                 ShowMessage("First Name is required", true);
                 txtFirstNameDriver.Focus();
                 return false;
             }
+
             if (string.IsNullOrWhiteSpace(txtLastNameDriver.Text))
             {
                 ShowMessage("Last Name is required", true);
                 txtLastNameDriver.Focus();
                 return false;
             }
+
+            if (string.IsNullOrWhiteSpace(txtPhoneDriver.Text))
+            {
+                ShowMessage("Phone is required", true);
+                txtPhoneDriver.Focus();
+                return false;
+            }
+
             if (cmbLicenseClass.SelectedIndex == -1)
             {
-                ShowMessage("License Class is required", true);
+                ShowMessage("Please select a license class", true);
                 cmbLicenseClass.Focus();
                 return false;
             }
+
+            if (dtpLicenseExpiry.Value <= DateTime.Now)
+            {
+                ShowMessage("License expiry date must be in the future", true);
+                dtpLicenseExpiry.Focus();
+                return false;
+            }
+
+            if (numHourlyRateDriver.Value <= 0)
+            {
+                ShowMessage("Hourly rate must be greater than 0", true);
+                numHourlyRateDriver.Focus();
+                return false;
+            }
+
             return true;
         }
         #endregion
@@ -469,7 +548,9 @@ namespace e_Shift
         {
             try
             {
-                string query = @"SELECT AssistantID, FirstName, LastName, Phone, Email, HireDate, HourlyRate, IsAvailable FROM Assistants WHERE IsDeleted = 0 ORDER BY FirstName, LastName";
+                string query = @"SELECT AssistantID, FirstName, LastName, Phone, Email, Address, 
+                        HireDate, HourlyRate, IsAvailable 
+                        FROM Assistants WHERE IsDeleted = 0 ORDER BY FirstName, LastName";
                 DataTable dataTable = DatabaseConnection.FillDataTable(query);
                 if (dataTable != null)
                 {
@@ -490,8 +571,18 @@ namespace e_Shift
                 dgvAssistants.Columns["AssistantID"].Visible = false;
                 dgvAssistants.Columns["FirstName"].HeaderText = "First Name";
                 dgvAssistants.Columns["LastName"].HeaderText = "Last Name";
+                dgvAssistants.Columns["Phone"].HeaderText = "Phone";
+                dgvAssistants.Columns["Email"].HeaderText = "Email";
+                dgvAssistants.Columns["Address"].HeaderText = "Address";
                 dgvAssistants.Columns["HireDate"].HeaderText = "Hire Date";
                 dgvAssistants.Columns["HourlyRate"].HeaderText = "Rate";
+                dgvAssistants.Columns["IsAvailable"].HeaderText = "Available";
+
+                // Format columns
+                if (dgvAssistants.Columns["HourlyRate"] != null)
+                    dgvAssistants.Columns["HourlyRate"].DefaultCellStyle.Format = "C2"; // Currency format
+                if (dgvAssistants.Columns["HireDate"] != null)
+                    dgvAssistants.Columns["HireDate"].DefaultCellStyle.Format = "yyyy-MM-dd";
             }
         }
 
@@ -499,21 +590,37 @@ namespace e_Shift
         {
             try
             {
-                string query = @"SELECT * FROM Assistants WHERE AssistantID = @AssistantID";
+                string query = @"SELECT * FROM Assistants WHERE AssistantID = @AssistantID AND IsDeleted = 0";
                 SqlParameter[] parameters = { new SqlParameter("@AssistantID", assistantID) };
 
                 using (SqlDataReader reader = DatabaseConnection.ExecuteReader(query, parameters))
                 {
                     if (reader != null && reader.Read())
                     {
-                        txtFirstNameAssistant.Text = reader["FirstName"].ToString();
-                        txtLastNameAssistant.Text = reader["LastName"].ToString();
-                        txtPhoneAssistant.Text = reader["Phone"].ToString();
-                        txtEmailAssistant.Text = reader["Email"].ToString();
-                        txtAddressAssistant.Text = reader["Address"].ToString();
-                        dtpHireDate.Value = Convert.ToDateTime(reader["HireDate"]);
-                        numHourlyRateAssistant.Value = Convert.ToDecimal(reader["HourlyRate"]);
-                        chkIsAvailableAssistant.Checked = Convert.ToBoolean(reader["IsAvailable"]);
+                        // Handle potential null values with proper checking
+                        txtFirstNameAssistant.Text = reader["FirstName"]?.ToString() ?? "";
+                        txtLastNameAssistant.Text = reader["LastName"]?.ToString() ?? "";
+                        txtPhoneAssistant.Text = reader["Phone"]?.ToString() ?? "";
+                        txtEmailAssistant.Text = reader["Email"]?.ToString() ?? "";
+                        txtAddressAssistant.Text = reader["Address"]?.ToString() ?? "";
+
+                        // Safe conversion for HireDate
+                        if (reader["HireDate"] != DBNull.Value)
+                            dtpHireDate.Value = Convert.ToDateTime(reader["HireDate"]);
+                        else
+                            dtpHireDate.Value = DateTime.Now;
+
+                        // Safe conversion for HourlyRate
+                        if (reader["HourlyRate"] != DBNull.Value)
+                            numHourlyRateAssistant.Value = Convert.ToDecimal(reader["HourlyRate"]);
+                        else
+                            numHourlyRateAssistant.Value = 800; // Default rate for assistants
+
+                        // Safe conversion for IsAvailable
+                        if (reader["IsAvailable"] != DBNull.Value)
+                            chkIsAvailableAssistant.Checked = Convert.ToBoolean(reader["IsAvailable"]);
+                        else
+                            chkIsAvailableAssistant.Checked = true;
                     }
                 }
             }
@@ -532,7 +639,7 @@ namespace e_Shift
             txtEmailAssistant.Clear();
             txtAddressAssistant.Clear();
             dtpHireDate.Value = DateTime.Now;
-            numHourlyRateAssistant.Value = 0;
+            numHourlyRateAssistant.Value = 800; // Default assistant rate
             chkIsAvailableAssistant.Checked = true;
         }
 
@@ -544,14 +651,38 @@ namespace e_Shift
                 txtFirstNameAssistant.Focus();
                 return false;
             }
+
             if (string.IsNullOrWhiteSpace(txtLastNameAssistant.Text))
             {
                 ShowMessage("Last Name is required", true);
                 txtLastNameAssistant.Focus();
                 return false;
             }
+
+            if (string.IsNullOrWhiteSpace(txtPhoneAssistant.Text))
+            {
+                ShowMessage("Phone is required", true);
+                txtPhoneAssistant.Focus();
+                return false;
+            }
+
+            if (numHourlyRateAssistant.Value <= 0)
+            {
+                ShowMessage("Hourly rate must be greater than 0", true);
+                numHourlyRateAssistant.Focus();
+                return false;
+            }
+
+            if (dtpHireDate.Value > DateTime.Now)
+            {
+                ShowMessage("Hire date cannot be in the future", true);
+                dtpHireDate.Focus();
+                return false;
+            }
+
             return true;
         }
+
         #endregion
 
         #region Containers Management
@@ -559,7 +690,9 @@ namespace e_Shift
         {
             try
             {
-                string query = @"SELECT ContainerID, ContainerNumber, Type, Capacity, Status, IsAvailable FROM Containers WHERE IsDeleted = 0 ORDER BY ContainerNumber";
+                string query = @"SELECT ContainerID, ContainerNumber, Type, Capacity, Length, Width, Height, 
+                        Material, Status, IsAvailable 
+                        FROM Containers WHERE IsDeleted = 0 ORDER BY ContainerNumber";
                 DataTable dataTable = DatabaseConnection.FillDataTable(query);
                 if (dataTable != null)
                 {
@@ -579,6 +712,24 @@ namespace e_Shift
             {
                 dgvContainers.Columns["ContainerID"].Visible = false;
                 dgvContainers.Columns["ContainerNumber"].HeaderText = "Container No.";
+                dgvContainers.Columns["Type"].HeaderText = "Type";
+                dgvContainers.Columns["Capacity"].HeaderText = "Capacity (m³)";
+                dgvContainers.Columns["Length"].HeaderText = "Length (m)";
+                dgvContainers.Columns["Width"].HeaderText = "Width (m)";
+                dgvContainers.Columns["Height"].HeaderText = "Height (m)";
+                dgvContainers.Columns["Material"].HeaderText = "Material";
+                dgvContainers.Columns["Status"].HeaderText = "Status";
+                dgvContainers.Columns["IsAvailable"].HeaderText = "Available";
+
+                // Format decimal columns
+                if (dgvContainers.Columns["Capacity"] != null)
+                    dgvContainers.Columns["Capacity"].DefaultCellStyle.Format = "N2";
+                if (dgvContainers.Columns["Length"] != null)
+                    dgvContainers.Columns["Length"].DefaultCellStyle.Format = "N2";
+                if (dgvContainers.Columns["Width"] != null)
+                    dgvContainers.Columns["Width"].DefaultCellStyle.Format = "N2";
+                if (dgvContainers.Columns["Height"] != null)
+                    dgvContainers.Columns["Height"].DefaultCellStyle.Format = "N2";
             }
         }
 
@@ -586,18 +737,30 @@ namespace e_Shift
         {
             try
             {
-                string query = @"SELECT * FROM Containers WHERE ContainerID = @ContainerID";
+                string query = @"SELECT * FROM Containers WHERE ContainerID = @ContainerID AND IsDeleted = 0";
                 SqlParameter[] parameters = { new SqlParameter("@ContainerID", containerID) };
 
                 using (SqlDataReader reader = DatabaseConnection.ExecuteReader(query, parameters))
                 {
                     if (reader != null && reader.Read())
                     {
-                        txtContainerNumber.Text = reader["ContainerNumber"].ToString();
-                        cmbType.Text = reader["Type"].ToString();
-                        numCapacity.Value = Convert.ToDecimal(reader["Capacity"]);
-                        cmbStatusContainer.Text = reader["Status"].ToString();
-                        chkIsAvailableContainer.Checked = Convert.ToBoolean(reader["IsAvailable"]);
+                        // Handle potential null values with proper checking
+                        txtContainerNumber.Text = reader["ContainerNumber"]?.ToString() ?? "";
+                        cmbType.Text = reader["Type"]?.ToString() ?? "Standard";
+
+                        // Safe conversion for Capacity
+                        if (reader["Capacity"] != DBNull.Value)
+                            numCapacity.Value = Convert.ToDecimal(reader["Capacity"]);
+                        else
+                            numCapacity.Value = 1;
+
+                        cmbStatusContainer.Text = reader["Status"]?.ToString() ?? "Available";
+
+                        // Safe conversion for IsAvailable
+                        if (reader["IsAvailable"] != DBNull.Value)
+                            chkIsAvailableContainer.Checked = Convert.ToBoolean(reader["IsAvailable"]);
+                        else
+                            chkIsAvailableContainer.Checked = true;
                     }
                 }
             }
@@ -612,7 +775,7 @@ namespace e_Shift
             selectedContainerID = 0;
             txtContainerNumber.Clear();
             cmbType.SelectedIndex = -1;
-            numCapacity.Value = 0;
+            numCapacity.Value = 1;
             cmbStatusContainer.SelectedIndex = 0;
             chkIsAvailableContainer.Checked = true;
         }
@@ -625,12 +788,28 @@ namespace e_Shift
                 txtContainerNumber.Focus();
                 return false;
             }
+
             if (cmbType.SelectedIndex == -1)
             {
                 ShowMessage("Container Type is required", true);
                 cmbType.Focus();
                 return false;
             }
+
+            if (numCapacity.Value <= 0)
+            {
+                ShowMessage("Capacity must be greater than 0", true);
+                numCapacity.Focus();
+                return false;
+            }
+
+            if (cmbStatusContainer.SelectedIndex == -1)
+            {
+                ShowMessage("Please select a status", true);
+                cmbStatusContainer.Focus();
+                return false;
+            }
+
             return true;
         }
         #endregion
@@ -784,23 +963,23 @@ namespace e_Shift
             {
                 try
                 {
-                    string query = @"INSERT INTO Lorries (RegistrationNumber, Make, Model, Year, LoadCapacity, VolumeCapacity, FuelType, LastMaintenanceDate, Status, IsAvailable, CreatedDate, ModifiedDate) 
-                           VALUES (@RegistrationNumber, @Make, @Model, @Year, @LoadCapacity, @VolumeCapacity, @FuelType, @LastMaintenanceDate, @Status, @IsAvailable, @CreatedDate, @ModifiedDate)";
+                    string query = @"INSERT INTO Lorries (RegistrationNumber, Make, Model, Year, LoadCapacity, VolumeCapacity, FuelType, LastMaintenance, Status, IsAvailable, CreatedDate, ModifiedDate) 
+                           VALUES (@RegistrationNumber, @Make, @Model, @Year, @LoadCapacity, @VolumeCapacity, @FuelType, @LastMaintenance, @Status, @IsAvailable, @CreatedDate, @ModifiedDate)";
 
                     SqlParameter[] parameters = {
-                        new SqlParameter("@RegistrationNumber", txtRegistrationNumber.Text.Trim()),
-                        new SqlParameter("@Make", txtMake.Text.Trim()),
-                        new SqlParameter("@Model", txtModel.Text.Trim()),
-                        new SqlParameter("@Year", numYear.Value),
-                        new SqlParameter("@LoadCapacity", numLoadCapacity.Value),
-                        new SqlParameter("@VolumeCapacity", numVolumeCapacity.Value),
-                        new SqlParameter("@FuelType", cmbFuelType.Text),
-                        new SqlParameter("@LastMaintenanceDate", dtpLastMaintenance.Value),
-                        new SqlParameter("@Status", cmbStatusLorry.Text),
-                        new SqlParameter("@IsAvailable", chkIsAvailableLorry.Checked),
-                        new SqlParameter("@CreatedDate", DateTime.Now),
-                        new SqlParameter("@ModifiedDate", DateTime.Now)
-                    };
+                new SqlParameter("@RegistrationNumber", txtRegistrationNumber.Text.Trim()),
+                new SqlParameter("@Make", txtMake.Text.Trim()),
+                new SqlParameter("@Model", txtModel.Text.Trim()),
+                new SqlParameter("@Year", (int)numYear.Value),
+                new SqlParameter("@LoadCapacity", numLoadCapacity.Value),
+                new SqlParameter("@VolumeCapacity", numVolumeCapacity.Value),
+                new SqlParameter("@FuelType", cmbFuelType.Text),
+                new SqlParameter("@LastMaintenance", dtpLastMaintenance.Value),
+                new SqlParameter("@Status", cmbStatusLorry.Text),
+                new SqlParameter("@IsAvailable", chkIsAvailableLorry.Checked),
+                new SqlParameter("@CreatedDate", DateTime.Now),
+                new SqlParameter("@ModifiedDate", DateTime.Now)
+            };
 
                     int result = DatabaseConnection.ExecuteNonQuery(query, parameters);
                     if (result > 0)
@@ -820,29 +999,44 @@ namespace e_Shift
 
         private void btnUpdateLorry_Click(object sender, EventArgs e)
         {
-            if (selectedLorryID > 0 && ValidateLorryData())
+            if (selectedLorryID <= 0)
+            {
+                ShowMessage("Please select a lorry to update", true);
+                return;
+            }
+
+            if (ValidateLorryData())
             {
                 try
                 {
-                    string query = @"UPDATE Lorries SET RegistrationNumber = @RegistrationNumber, Make = @Make, Model = @Model, 
-                           Year = @Year, LoadCapacity = @LoadCapacity, VolumeCapacity = @VolumeCapacity, 
-                           FuelType = @FuelType, LastMaintenanceDate = @LastMaintenanceDate, Status = @Status, 
-                           IsAvailable = @IsAvailable, ModifiedDate = @ModifiedDate WHERE LorryID = @LorryID";
+                    string query = @"UPDATE Lorries SET 
+                           RegistrationNumber = @RegistrationNumber,
+                           Make = @Make,
+                           Model = @Model,
+                           Year = @Year,
+                           LoadCapacity = @LoadCapacity,
+                           VolumeCapacity = @VolumeCapacity,
+                           FuelType = @FuelType,
+                           LastMaintenance = @LastMaintenance,
+                           Status = @Status,
+                           IsAvailable = @IsAvailable,
+                           ModifiedDate = @ModifiedDate
+                           WHERE LorryID = @LorryID";
 
                     SqlParameter[] parameters = {
-                        new SqlParameter("@RegistrationNumber", txtRegistrationNumber.Text.Trim()),
-                        new SqlParameter("@Make", txtMake.Text.Trim()),
-                        new SqlParameter("@Model", txtModel.Text.Trim()),
-                        new SqlParameter("@Year", numYear.Value),
-                        new SqlParameter("@LoadCapacity", numLoadCapacity.Value),
-                        new SqlParameter("@VolumeCapacity", numVolumeCapacity.Value),
-                        new SqlParameter("@FuelType", cmbFuelType.Text),
-                        new SqlParameter("@LastMaintenanceDate", dtpLastMaintenance.Value),
-                        new SqlParameter("@Status", cmbStatusLorry.Text),
-                        new SqlParameter("@IsAvailable", chkIsAvailableLorry.Checked),
-                        new SqlParameter("@ModifiedDate", DateTime.Now),
-                        new SqlParameter("@LorryID", selectedLorryID)
-                    };
+                new SqlParameter("@LorryID", selectedLorryID),
+                new SqlParameter("@RegistrationNumber", txtRegistrationNumber.Text.Trim()),
+                new SqlParameter("@Make", txtMake.Text.Trim()),
+                new SqlParameter("@Model", txtModel.Text.Trim()),
+                new SqlParameter("@Year", (int)numYear.Value),
+                new SqlParameter("@LoadCapacity", numLoadCapacity.Value),
+                new SqlParameter("@VolumeCapacity", numVolumeCapacity.Value),
+                new SqlParameter("@FuelType", cmbFuelType.Text),
+                new SqlParameter("@LastMaintenance", dtpLastMaintenance.Value),
+                new SqlParameter("@Status", cmbStatusLorry.Text),
+                new SqlParameter("@IsAvailable", chkIsAvailableLorry.Checked),
+                new SqlParameter("@ModifiedDate", DateTime.Now)
+            };
 
                     int result = DatabaseConnection.ExecuteNonQuery(query, parameters);
                     if (result > 0)
@@ -850,6 +1044,7 @@ namespace e_Shift
                         ShowMessage("Lorry updated successfully!", false);
                         LoadLorries();
                         LoadComboBoxData();
+                        ClearLorryForm();
                     }
                 }
                 catch (Exception ex)
@@ -861,33 +1056,52 @@ namespace e_Shift
 
         private void btnDeleteLorry_Click(object sender, EventArgs e)
         {
-            if (selectedLorryID > 0)
+            if (selectedLorryID <= 0)
             {
-                DialogResult result = MessageBox.Show("Are you sure you want to delete this lorry?",
-                    "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (result == DialogResult.Yes)
-                {
-                    try
-                    {
-                        string query = @"UPDATE Lorries SET IsDeleted = 1, ModifiedDate = @ModifiedDate WHERE LorryID = @LorryID";
-                        SqlParameter[] parameters = {
-                            new SqlParameter("@ModifiedDate", DateTime.Now),
-                            new SqlParameter("@LorryID", selectedLorryID)
-                        };
+                ShowMessage("Please select a lorry to delete", true);
+                return;
+            }
 
-                        int deleteResult = DatabaseConnection.ExecuteNonQuery(query, parameters);
-                        if (deleteResult > 0)
-                        {
-                            ShowMessage("Lorry deleted successfully!", false);
-                            LoadLorries();
-                            LoadComboBoxData();
-                            ClearLorryForm();
-                        }
-                    }
-                    catch (Exception ex)
+            DialogResult result = MessageBox.Show(
+                "Are you sure you want to delete this lorry?",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    // Check if lorry is used in any transport units
+                    string checkQuery = "SELECT COUNT(*) FROM TransportUnits WHERE LorryID = @LorryID AND IsDeleted = 0";
+                    SqlParameter[] checkParams = { new SqlParameter("@LorryID", selectedLorryID) };
+
+                    object count = DatabaseConnection.ExecuteScalar(checkQuery, checkParams);
+                    if (Convert.ToInt32(count) > 0)
                     {
-                        ShowMessage($"Error deleting lorry: {ex.Message}", true);
+                        ShowMessage("Cannot delete lorry: It is assigned to transport units", true);
+                        return;
                     }
+
+                    // Soft delete the lorry
+                    string deleteQuery = @"UPDATE Lorries SET IsDeleted = 1, ModifiedDate = @ModifiedDate WHERE LorryID = @LorryID";
+                    SqlParameter[] deleteParams = {
+                new SqlParameter("@LorryID", selectedLorryID),
+                new SqlParameter("@ModifiedDate", DateTime.Now)
+            };
+
+                    int deleteResult = DatabaseConnection.ExecuteNonQuery(deleteQuery, deleteParams);
+                    if (deleteResult > 0)
+                    {
+                        ShowMessage("Lorry deleted successfully!", false);
+                        LoadLorries();
+                        LoadComboBoxData();
+                        ClearLorryForm();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ShowMessage($"Error deleting lorry: {ex.Message}", true);
                 }
             }
         }
@@ -895,6 +1109,8 @@ namespace e_Shift
 
 
         // Driver Events
+        // FIXED EVENT HANDLERS FOR DRIVER BUTTONS
+
         private void btnAddDriver_Click(object sender, EventArgs e)
         {
             if (ValidateDriverData())
@@ -902,15 +1118,15 @@ namespace e_Shift
                 try
                 {
                     string query = @"INSERT INTO Drivers (LicenseNumber, FirstName, LastName, Phone, Email, Address, LicenseExpiry, LicenseClass, HourlyRate, IsAvailable, CreatedDate, ModifiedDate) 
-                   VALUES (@LicenseNumber, @FirstName, @LastName, @Phone, @Email, @Address, @LicenseExpiry, @LicenseClass, @HourlyRate, @IsAvailable, @CreatedDate, @ModifiedDate)";
+                           VALUES (@LicenseNumber, @FirstName, @LastName, @Phone, @Email, @Address, @LicenseExpiry, @LicenseClass, @HourlyRate, @IsAvailable, @CreatedDate, @ModifiedDate)";
 
                     SqlParameter[] parameters = {
                 new SqlParameter("@LicenseNumber", txtLicenseNumber.Text.Trim()),
                 new SqlParameter("@FirstName", txtFirstNameDriver.Text.Trim()),
                 new SqlParameter("@LastName", txtLastNameDriver.Text.Trim()),
                 new SqlParameter("@Phone", txtPhoneDriver.Text.Trim()),
-                new SqlParameter("@Email", txtEmailDriver.Text.Trim()),
-                new SqlParameter("@Address", txtAddressDriver.Text.Trim()),
+                new SqlParameter("@Email", string.IsNullOrWhiteSpace(txtEmailDriver.Text) ? (object)DBNull.Value : txtEmailDriver.Text.Trim()),
+                new SqlParameter("@Address", string.IsNullOrWhiteSpace(txtAddressDriver.Text) ? (object)DBNull.Value : txtAddressDriver.Text.Trim()),
                 new SqlParameter("@LicenseExpiry", dtpLicenseExpiry.Value),
                 new SqlParameter("@LicenseClass", cmbLicenseClass.Text),
                 new SqlParameter("@HourlyRate", numHourlyRateDriver.Value),
@@ -937,26 +1153,109 @@ namespace e_Shift
 
         private void btnUpdateDriver_Click(object sender, EventArgs e)
         {
-            if (selectedDriverID > 0 && ValidateDriverData())
+            if (selectedDriverID <= 0)
             {
-                ShowMessage("Driver updated successfully!", false);
-                LoadDrivers();
-                LoadComboBoxData();
+                ShowMessage("Please select a driver to update", true);
+                return;
+            }
+
+            if (ValidateDriverData())
+            {
+                try
+                {
+                    string query = @"UPDATE Drivers SET 
+                           LicenseNumber = @LicenseNumber,
+                           FirstName = @FirstName,
+                           LastName = @LastName,
+                           Phone = @Phone,
+                           Email = @Email,
+                           Address = @Address,
+                           LicenseExpiry = @LicenseExpiry,
+                           LicenseClass = @LicenseClass,
+                           HourlyRate = @HourlyRate,
+                           IsAvailable = @IsAvailable,
+                           ModifiedDate = @ModifiedDate
+                           WHERE DriverID = @DriverID";
+
+                    SqlParameter[] parameters = {
+                new SqlParameter("@DriverID", selectedDriverID),
+                new SqlParameter("@LicenseNumber", txtLicenseNumber.Text.Trim()),
+                new SqlParameter("@FirstName", txtFirstNameDriver.Text.Trim()),
+                new SqlParameter("@LastName", txtLastNameDriver.Text.Trim()),
+                new SqlParameter("@Phone", txtPhoneDriver.Text.Trim()),
+                new SqlParameter("@Email", string.IsNullOrWhiteSpace(txtEmailDriver.Text) ? (object)DBNull.Value : txtEmailDriver.Text.Trim()),
+                new SqlParameter("@Address", string.IsNullOrWhiteSpace(txtAddressDriver.Text) ? (object)DBNull.Value : txtAddressDriver.Text.Trim()),
+                new SqlParameter("@LicenseExpiry", dtpLicenseExpiry.Value),
+                new SqlParameter("@LicenseClass", cmbLicenseClass.Text),
+                new SqlParameter("@HourlyRate", numHourlyRateDriver.Value),
+                new SqlParameter("@IsAvailable", chkIsAvailableDriver.Checked),
+                new SqlParameter("@ModifiedDate", DateTime.Now)
+            };
+
+                    int result = DatabaseConnection.ExecuteNonQuery(query, parameters);
+                    if (result > 0)
+                    {
+                        ShowMessage("Driver updated successfully!", false);
+                        LoadDrivers();
+                        LoadComboBoxData();
+                        ClearDriverForm();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ShowMessage($"Error updating driver: {ex.Message}", true);
+                }
             }
         }
 
         private void btnDeleteDriver_Click(object sender, EventArgs e)
         {
-            if (selectedDriverID > 0)
+            if (selectedDriverID <= 0)
             {
-                DialogResult result = MessageBox.Show("Are you sure you want to delete this driver?",
-                    "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (result == DialogResult.Yes)
+                ShowMessage("Please select a driver to delete", true);
+                return;
+            }
+
+            DialogResult result = MessageBox.Show(
+                "Are you sure you want to delete this driver?",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                try
                 {
-                    ShowMessage("Driver deleted successfully!", false);
-                    LoadDrivers();
-                    LoadComboBoxData();
-                    ClearDriverForm();
+                    // Check if driver is used in any transport units
+                    string checkQuery = "SELECT COUNT(*) FROM TransportUnits WHERE DriverID = @DriverID AND IsDeleted = 0";
+                    SqlParameter[] checkParams = { new SqlParameter("@DriverID", selectedDriverID) };
+
+                    object count = DatabaseConnection.ExecuteScalar(checkQuery, checkParams);
+                    if (Convert.ToInt32(count) > 0)
+                    {
+                        ShowMessage("Cannot delete driver: Driver is assigned to transport units", true);
+                        return;
+                    }
+
+                    // Soft delete the driver
+                    string deleteQuery = @"UPDATE Drivers SET IsDeleted = 1, ModifiedDate = @ModifiedDate WHERE DriverID = @DriverID";
+                    SqlParameter[] deleteParams = {
+                new SqlParameter("@DriverID", selectedDriverID),
+                new SqlParameter("@ModifiedDate", DateTime.Now)
+            };
+
+                    int deleteResult = DatabaseConnection.ExecuteNonQuery(deleteQuery, deleteParams);
+                    if (deleteResult > 0)
+                    {
+                        ShowMessage("Driver deleted successfully!", false);
+                        LoadDrivers();
+                        LoadComboBoxData();
+                        ClearDriverForm();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ShowMessage($"Error deleting driver: {ex.Message}", true);
                 }
             }
         }
@@ -965,6 +1264,8 @@ namespace e_Shift
 
 
         // Assistant Events
+        // FIXED EVENT HANDLERS FOR ASSISTANT BUTTONS
+
         private void btnAddAssistant_Click(object sender, EventArgs e)
         {
             if (ValidateAssistantData())
@@ -975,17 +1276,17 @@ namespace e_Shift
                            VALUES (@FirstName, @LastName, @Phone, @Email, @Address, @HireDate, @HourlyRate, @IsAvailable, @CreatedDate, @ModifiedDate)";
 
                     SqlParameter[] parameters = {
-                        new SqlParameter("@FirstName", txtFirstNameAssistant.Text.Trim()),
-                        new SqlParameter("@LastName", txtLastNameAssistant.Text.Trim()),
-                        new SqlParameter("@Phone", txtPhoneAssistant.Text.Trim()),
-                        new SqlParameter("@Email", txtEmailAssistant.Text.Trim()),
-                        new SqlParameter("@Address", txtAddressAssistant.Text.Trim()),
-                        new SqlParameter("@HireDate", dtpHireDate.Value),
-                        new SqlParameter("@HourlyRate", numHourlyRateAssistant.Value),
-                        new SqlParameter("@IsAvailable", chkIsAvailableAssistant.Checked),
-                        new SqlParameter("@CreatedDate", DateTime.Now),
-                        new SqlParameter("@ModifiedDate", DateTime.Now)
-                    };
+                new SqlParameter("@FirstName", txtFirstNameAssistant.Text.Trim()),
+                new SqlParameter("@LastName", txtLastNameAssistant.Text.Trim()),
+                new SqlParameter("@Phone", txtPhoneAssistant.Text.Trim()),
+                new SqlParameter("@Email", string.IsNullOrWhiteSpace(txtEmailAssistant.Text) ? (object)DBNull.Value : txtEmailAssistant.Text.Trim()),
+                new SqlParameter("@Address", string.IsNullOrWhiteSpace(txtAddressAssistant.Text) ? (object)DBNull.Value : txtAddressAssistant.Text.Trim()),
+                new SqlParameter("@HireDate", dtpHireDate.Value),
+                new SqlParameter("@HourlyRate", numHourlyRateAssistant.Value),
+                new SqlParameter("@IsAvailable", chkIsAvailableAssistant.Checked),
+                new SqlParameter("@CreatedDate", DateTime.Now),
+                new SqlParameter("@ModifiedDate", DateTime.Now)
+            };
 
                     int result = DatabaseConnection.ExecuteNonQuery(query, parameters);
                     if (result > 0)
@@ -1005,26 +1306,40 @@ namespace e_Shift
 
         private void btnUpdateAssistant_Click(object sender, EventArgs e)
         {
-            if (selectedAssistantID > 0 && ValidateAssistantData())
+            if (selectedAssistantID <= 0)
+            {
+                ShowMessage("Please select an assistant to update", true);
+                return;
+            }
+
+            if (ValidateAssistantData())
             {
                 try
                 {
-                    string query = @"UPDATE Assistants SET FirstName = @FirstName, LastName = @LastName, Phone = @Phone, 
-                           Email = @Email, Address = @Address, HireDate = @HireDate, HourlyRate = @HourlyRate, 
-                           IsAvailable = @IsAvailable, ModifiedDate = @ModifiedDate WHERE AssistantID = @AssistantID";
+                    string query = @"UPDATE Assistants SET 
+                           FirstName = @FirstName,
+                           LastName = @LastName,
+                           Phone = @Phone,
+                           Email = @Email,
+                           Address = @Address,
+                           HireDate = @HireDate,
+                           HourlyRate = @HourlyRate,
+                           IsAvailable = @IsAvailable,
+                           ModifiedDate = @ModifiedDate
+                           WHERE AssistantID = @AssistantID";
 
                     SqlParameter[] parameters = {
-                        new SqlParameter("@FirstName", txtFirstNameAssistant.Text.Trim()),
-                        new SqlParameter("@LastName", txtLastNameAssistant.Text.Trim()),
-                        new SqlParameter("@Phone", txtPhoneAssistant.Text.Trim()),
-                        new SqlParameter("@Email", txtEmailAssistant.Text.Trim()),
-                        new SqlParameter("@Address", txtAddressAssistant.Text.Trim()),
-                        new SqlParameter("@HireDate", dtpHireDate.Value),
-                        new SqlParameter("@HourlyRate", numHourlyRateAssistant.Value),
-                        new SqlParameter("@IsAvailable", chkIsAvailableAssistant.Checked),
-                        new SqlParameter("@ModifiedDate", DateTime.Now),
-                        new SqlParameter("@AssistantID", selectedAssistantID)
-                    };
+                new SqlParameter("@AssistantID", selectedAssistantID),
+                new SqlParameter("@FirstName", txtFirstNameAssistant.Text.Trim()),
+                new SqlParameter("@LastName", txtLastNameAssistant.Text.Trim()),
+                new SqlParameter("@Phone", txtPhoneAssistant.Text.Trim()),
+                new SqlParameter("@Email", string.IsNullOrWhiteSpace(txtEmailAssistant.Text) ? (object)DBNull.Value : txtEmailAssistant.Text.Trim()),
+                new SqlParameter("@Address", string.IsNullOrWhiteSpace(txtAddressAssistant.Text) ? (object)DBNull.Value : txtAddressAssistant.Text.Trim()),
+                new SqlParameter("@HireDate", dtpHireDate.Value),
+                new SqlParameter("@HourlyRate", numHourlyRateAssistant.Value),
+                new SqlParameter("@IsAvailable", chkIsAvailableAssistant.Checked),
+                new SqlParameter("@ModifiedDate", DateTime.Now)
+            };
 
                     int result = DatabaseConnection.ExecuteNonQuery(query, parameters);
                     if (result > 0)
@@ -1032,6 +1347,7 @@ namespace e_Shift
                         ShowMessage("Assistant updated successfully!", false);
                         LoadAssistants();
                         LoadComboBoxData();
+                        ClearAssistantForm();
                     }
                 }
                 catch (Exception ex)
@@ -1043,36 +1359,56 @@ namespace e_Shift
 
         private void btnDeleteAssistant_Click(object sender, EventArgs e)
         {
-            if (selectedAssistantID > 0)
+            if (selectedAssistantID <= 0)
             {
-                DialogResult result = MessageBox.Show("Are you sure you want to delete this assistant?",
-                    "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (result == DialogResult.Yes)
-                {
-                    try
-                    {
-                        string query = @"UPDATE Assistants SET IsDeleted = 1, ModifiedDate = @ModifiedDate WHERE AssistantID = @AssistantID";
-                        SqlParameter[] parameters = {
-                            new SqlParameter("@ModifiedDate", DateTime.Now),
-                            new SqlParameter("@AssistantID", selectedAssistantID)
-                        };
+                ShowMessage("Please select an assistant to delete", true);
+                return;
+            }
 
-                        int deleteResult = DatabaseConnection.ExecuteNonQuery(query, parameters);
-                        if (deleteResult > 0)
-                        {
-                            ShowMessage("Assistant deleted successfully!", false);
-                            LoadAssistants();
-                            LoadComboBoxData();
-                            ClearAssistantForm();
-                        }
-                    }
-                    catch (Exception ex)
+            DialogResult result = MessageBox.Show(
+                "Are you sure you want to delete this assistant?",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    // Check if assistant is used in any transport units
+                    string checkQuery = "SELECT COUNT(*) FROM TransportUnits WHERE AssistantID = @AssistantID AND IsDeleted = 0";
+                    SqlParameter[] checkParams = { new SqlParameter("@AssistantID", selectedAssistantID) };
+
+                    object count = DatabaseConnection.ExecuteScalar(checkQuery, checkParams);
+                    if (Convert.ToInt32(count) > 0)
                     {
-                        ShowMessage($"Error deleting assistant: {ex.Message}", true);
+                        ShowMessage("Cannot delete assistant: Assistant is assigned to transport units", true);
+                        return;
                     }
+
+                    // Soft delete the assistant
+                    string deleteQuery = @"UPDATE Assistants SET IsDeleted = 1, ModifiedDate = @ModifiedDate WHERE AssistantID = @AssistantID";
+                    SqlParameter[] deleteParams = {
+                new SqlParameter("@AssistantID", selectedAssistantID),
+                new SqlParameter("@ModifiedDate", DateTime.Now)
+            };
+
+                    int deleteResult = DatabaseConnection.ExecuteNonQuery(deleteQuery, deleteParams);
+                    if (deleteResult > 0)
+                    {
+                        ShowMessage("Assistant deleted successfully!", false);
+                        LoadAssistants();
+                        LoadComboBoxData();
+                        ClearAssistantForm();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ShowMessage($"Error deleting assistant: {ex.Message}", true);
                 }
             }
         }
+
 
 
 
@@ -1084,18 +1420,22 @@ namespace e_Shift
             {
                 try
                 {
-                    string query = @"INSERT INTO Containers (ContainerNumber, Type, Capacity, Status, IsAvailable, CreatedDate, ModifiedDate) 
-                           VALUES (@ContainerNumber, @Type, @Capacity, @Status, @IsAvailable, @CreatedDate, @ModifiedDate)";
+                    string query = @"INSERT INTO Containers (ContainerNumber, Type, Capacity, Length, Width, Height, Material, Status, IsAvailable, CreatedDate, ModifiedDate) 
+                           VALUES (@ContainerNumber, @Type, @Capacity, @Length, @Width, @Height, @Material, @Status, @IsAvailable, @CreatedDate, @ModifiedDate)";
 
                     SqlParameter[] parameters = {
-                        new SqlParameter("@ContainerNumber", txtContainerNumber.Text.Trim()),
-                        new SqlParameter("@Type", cmbType.Text),
-                        new SqlParameter("@Capacity", numCapacity.Value),
-                        new SqlParameter("@Status", cmbStatusContainer.Text),
-                        new SqlParameter("@IsAvailable", chkIsAvailableContainer.Checked),
-                        new SqlParameter("@CreatedDate", DateTime.Now),
-                        new SqlParameter("@ModifiedDate", DateTime.Now)
-                    };
+                new SqlParameter("@ContainerNumber", txtContainerNumber.Text.Trim()),
+                new SqlParameter("@Type", cmbType.Text),
+                new SqlParameter("@Capacity", numCapacity.Value),
+                new SqlParameter("@Length", GetContainerLength(cmbType.Text)), // Calculate based on type
+                new SqlParameter("@Width", GetContainerWidth(cmbType.Text)),   // Calculate based on type
+                new SqlParameter("@Height", GetContainerHeight(cmbType.Text)), // Calculate based on type
+                new SqlParameter("@Material", "Steel"), // Default material
+                new SqlParameter("@Status", cmbStatusContainer.Text),
+                new SqlParameter("@IsAvailable", chkIsAvailableContainer.Checked),
+                new SqlParameter("@CreatedDate", DateTime.Now),
+                new SqlParameter("@ModifiedDate", DateTime.Now)
+            };
 
                     int result = DatabaseConnection.ExecuteNonQuery(query, parameters);
                     if (result > 0)
@@ -1115,23 +1455,40 @@ namespace e_Shift
 
         private void btnUpdateContainer_Click(object sender, EventArgs e)
         {
-            if (selectedContainerID > 0 && ValidateContainerData())
+            if (selectedContainerID <= 0)
+            {
+                ShowMessage("Please select a container to update", true);
+                return;
+            }
+
+            if (ValidateContainerData())
             {
                 try
                 {
-                    string query = @"UPDATE Containers SET ContainerNumber = @ContainerNumber, Type = @Type, 
-                           Capacity = @Capacity, Status = @Status, IsAvailable = @IsAvailable, 
-                           ModifiedDate = @ModifiedDate WHERE ContainerID = @ContainerID";
+                    string query = @"UPDATE Containers SET 
+                           ContainerNumber = @ContainerNumber,
+                           Type = @Type,
+                           Capacity = @Capacity,
+                           Length = @Length,
+                           Width = @Width,
+                           Height = @Height,
+                           Status = @Status,
+                           IsAvailable = @IsAvailable,
+                           ModifiedDate = @ModifiedDate
+                           WHERE ContainerID = @ContainerID";
 
                     SqlParameter[] parameters = {
-                        new SqlParameter("@ContainerNumber", txtContainerNumber.Text.Trim()),
-                        new SqlParameter("@Type", cmbType.Text),
-                        new SqlParameter("@Capacity", numCapacity.Value),
-                        new SqlParameter("@Status", cmbStatusContainer.Text),
-                        new SqlParameter("@IsAvailable", chkIsAvailableContainer.Checked),
-                        new SqlParameter("@ModifiedDate", DateTime.Now),
-                        new SqlParameter("@ContainerID", selectedContainerID)
-                    };
+                new SqlParameter("@ContainerID", selectedContainerID),
+                new SqlParameter("@ContainerNumber", txtContainerNumber.Text.Trim()),
+                new SqlParameter("@Type", cmbType.Text),
+                new SqlParameter("@Capacity", numCapacity.Value),
+                new SqlParameter("@Length", GetContainerLength(cmbType.Text)),
+                new SqlParameter("@Width", GetContainerWidth(cmbType.Text)),
+                new SqlParameter("@Height", GetContainerHeight(cmbType.Text)),
+                new SqlParameter("@Status", cmbStatusContainer.Text),
+                new SqlParameter("@IsAvailable", chkIsAvailableContainer.Checked),
+                new SqlParameter("@ModifiedDate", DateTime.Now)
+            };
 
                     int result = DatabaseConnection.ExecuteNonQuery(query, parameters);
                     if (result > 0)
@@ -1139,6 +1496,7 @@ namespace e_Shift
                         ShowMessage("Container updated successfully!", false);
                         LoadContainers();
                         LoadComboBoxData();
+                        ClearContainerForm();
                     }
                 }
                 catch (Exception ex)
@@ -1150,34 +1508,93 @@ namespace e_Shift
 
         private void btnDeleteContainer_Click(object sender, EventArgs e)
         {
-            if (selectedContainerID > 0)
+            if (selectedContainerID <= 0)
             {
-                DialogResult result = MessageBox.Show("Are you sure you want to delete this container?",
-                    "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (result == DialogResult.Yes)
-                {
-                    try
-                    {
-                        string query = @"UPDATE Containers SET IsDeleted = 1, ModifiedDate = @ModifiedDate WHERE ContainerID = @ContainerID";
-                        SqlParameter[] parameters = {
-                            new SqlParameter("@ModifiedDate", DateTime.Now),
-                            new SqlParameter("@ContainerID", selectedContainerID)
-                        };
+                ShowMessage("Please select a container to delete", true);
+                return;
+            }
 
-                        int deleteResult = DatabaseConnection.ExecuteNonQuery(query, parameters);
-                        if (deleteResult > 0)
-                        {
-                            ShowMessage("Container deleted successfully!", false);
-                            LoadContainers();
-                            LoadComboBoxData();
-                            ClearContainerForm();
-                        }
-                    }
-                    catch (Exception ex)
+            DialogResult result = MessageBox.Show(
+                "Are you sure you want to delete this container?",
+                "Confirm Delete",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    // Check if container is used in any transport units
+                    string checkQuery = "SELECT COUNT(*) FROM TransportUnits WHERE ContainerID = @ContainerID AND IsDeleted = 0";
+                    SqlParameter[] checkParams = { new SqlParameter("@ContainerID", selectedContainerID) };
+
+                    object count = DatabaseConnection.ExecuteScalar(checkQuery, checkParams);
+                    if (Convert.ToInt32(count) > 0)
                     {
-                        ShowMessage($"Error deleting container: {ex.Message}", true);
+                        ShowMessage("Cannot delete container: It is assigned to transport units", true);
+                        return;
+                    }
+
+                    // Soft delete the container
+                    string deleteQuery = @"UPDATE Containers SET IsDeleted = 1, ModifiedDate = @ModifiedDate WHERE ContainerID = @ContainerID";
+                    SqlParameter[] deleteParams = {
+                new SqlParameter("@ContainerID", selectedContainerID),
+                new SqlParameter("@ModifiedDate", DateTime.Now)
+            };
+
+                    int deleteResult = DatabaseConnection.ExecuteNonQuery(deleteQuery, deleteParams);
+                    if (deleteResult > 0)
+                    {
+                        ShowMessage("Container deleted successfully!", false);
+                        LoadContainers();
+                        LoadComboBoxData();
+                        ClearContainerForm();
                     }
                 }
+                catch (Exception ex)
+                {
+                    ShowMessage($"Error deleting container: {ex.Message}", true);
+                }
+            }
+        }
+
+        // HELPER METHODS FOR CONTAINER DIMENSIONS
+        private decimal GetContainerLength(string type)
+        {
+            switch (type?.ToLower())
+            {
+                case "small": return 4.00m;
+                case "standard": return 6.00m;
+                case "large": return 8.00m;
+                case "fragile": return 5.00m;
+                case "refrigerated": return 6.50m;
+                default: return 6.00m;
+            }
+        }
+
+        private decimal GetContainerWidth(string type)
+        {
+            switch (type?.ToLower())
+            {
+                case "small": return 2.00m;
+                case "standard": return 2.50m;
+                case "large": return 3.00m;
+                case "fragile": return 2.40m;
+                case "refrigerated": return 2.50m;
+                default: return 2.50m;
+            }
+        }
+
+        private decimal GetContainerHeight(string type)
+        {
+            switch (type?.ToLower())
+            {
+                case "small": return 2.00m;
+                case "standard": return 2.50m;
+                case "large": return 3.00m;
+                case "fragile": return 2.40m;
+                case "refrigerated": return 2.60m;
+                default: return 2.50m;
             }
         }
 
