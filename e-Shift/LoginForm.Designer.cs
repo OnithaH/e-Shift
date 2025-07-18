@@ -140,7 +140,6 @@
             lblStatus.Size = new Size(50, 20);
             lblStatus.TabIndex = 9;
             lblStatus.Text = "label1";
-            lblStatus.Click += lblStatus_Click;
             // 
             // groupBoxLoginType
             // 

@@ -21,17 +21,25 @@ namespace e_Shift
 
         private void LoginForm_Load(object sender, EventArgs e)
         {
+            // Set initial focus
             txtUsername.Focus();
 
+            // Test database connection
             if (!DatabaseConnection.TestConnection())
             {
-                ShowMessage("Database connection failed!", true);
+                ShowMessage("Database connection failed! Please check your connection.", true);
                 btnLogin.Enabled = false;
             }
             else
             {
                 ShowMessage("Ready to login", false);
             }
+
+            // Set default login type
+            rbCustomer.Checked = true;
+
+            // Clear any existing session
+            UserSession.Logout();
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
@@ -40,8 +48,10 @@ namespace e_Shift
             string password = txtPassword.Text.Trim();
             bool isAdmin = rbAdmin.Checked;
 
+            // Clear previous messages
             ShowMessage("", false);
 
+            // Validate input
             if (string.IsNullOrWhiteSpace(username))
             {
                 ShowMessage("Please enter username", true);
@@ -56,8 +66,10 @@ namespace e_Shift
                 return;
             }
 
+            // Disable login button during authentication
             btnLogin.Enabled = false;
             btnLogin.Text = "Authenticating...";
+            this.Cursor = Cursors.WaitCursor;
 
             try
             {
@@ -70,10 +82,16 @@ namespace e_Shift
                     AuthenticateCustomer(username, password);
                 }
             }
+            catch (Exception ex)
+            {
+                ShowMessage($"Login error: {ex.Message}", true);
+            }
             finally
             {
+                // Re-enable login button
                 btnLogin.Enabled = true;
                 btnLogin.Text = "Login";
+                this.Cursor = Cursors.Default;
             }
         }
 
@@ -81,7 +99,6 @@ namespace e_Shift
         {
             try
             {
-                // Note: We don't need Salt column anymore, just Password
                 string query = @"
                     SELECT AdminID, Username, Password, FirstName, LastName, Email, Role, IsActive 
                     FROM Admins 
@@ -103,7 +120,6 @@ namespace e_Shift
                             return;
                         }
 
-                        // SIMPLE SECURE PASSWORD VERIFICATION
                         byte[] storedPasswordHash = (byte[])reader["Password"];
 
                         if (VerifyPasswordSimple(password, storedPasswordHash))
@@ -121,41 +137,40 @@ namespace e_Shift
                             // Update last login
                             UpdateLastLogin("Admins", "AdminID", UserSession.UserId);
 
+                            // Log successful login
+                            LogLoginAttempt(username, "Admin", true, "Login successful");
+
+                            // Show success message
                             string fullName = UserSession.GetFullName();
                             ShowMessage($"Login successful! Welcome {fullName}", false);
 
-                            MessageBox.Show($"✅ Admin Login Successful!\n\n" +
-                                          $"Welcome: {fullName}\n" +
-                                          $"Role: {UserSession.Role}\n" +
-                                          $"Username: {UserSession.Username}\n" +
-                                          $"Login Time: {UserSession.LoginTime:HH:mm:ss}",
-                                          "Admin Dashboard",
-                                          MessageBoxButtons.OK,
-                                          MessageBoxIcon.Information);
+                            // Small delay to show success message
+                            Application.DoEvents();
+                            System.Threading.Thread.Sleep(500);
 
-                            // TODO: Open AdminDashboard form
-                            // AdminDashboard adminDashboard = new AdminDashboard();
-                            // adminDashboard.Show();
-                            // this.Hide();
-
-                            ClearForm();
+                            // Open AdminDashboard
+                            AdminDashboard adminDashboard = new AdminDashboard();
+                            adminDashboard.Show();
+                            this.Hide();
                         }
                         else
                         {
                             ShowMessage("Invalid password", true);
                             LogLoginAttempt(username, "Admin", false, "Invalid password");
+                            ClearPasswordField();
                         }
                     }
                     else
                     {
                         ShowMessage($"Admin '{username}' not found", true);
                         LogLoginAttempt(username, "Admin", false, "User not found");
+                        ClearPasswordField();
                     }
                 }
             }
             catch (Exception ex)
             {
-                ShowMessage($"Login error: {ex.Message}", true);
+                ShowMessage($"Admin login error: {ex.Message}", true);
                 LogLoginAttempt(username, "Admin", false, $"System error: {ex.Message}");
             }
         }
@@ -164,7 +179,6 @@ namespace e_Shift
         {
             try
             {
-                // Note: We don't need Salt column anymore, just Password
                 string query = @"
                     SELECT CustomerID, CustomerNumber, Password, FirstName, LastName, Email, IsActive 
                     FROM Customers 
@@ -185,7 +199,6 @@ namespace e_Shift
                             return;
                         }
 
-                        // SIMPLE SECURE PASSWORD VERIFICATION
                         byte[] storedPasswordHash = (byte[])reader["Password"];
 
                         if (VerifyPasswordSimple(password, storedPasswordHash))
@@ -202,46 +215,54 @@ namespace e_Shift
                             // Update last login
                             UpdateLastLogin("Customers", "CustomerID", UserSession.UserId);
 
+                            // Log successful login
+                            LogLoginAttempt(username, "Customer", true, "Login successful");
+
                             string fullName = UserSession.GetFullName();
                             ShowMessage($"Login successful! Welcome {fullName}", false);
 
+                            // Show temporary success message (will be replaced with CustomerDashboard)
                             MessageBox.Show($"✅ Customer Login Successful!\n\n" +
                                           $"Welcome: {fullName}\n" +
                                           $"Customer Number: {UserSession.Username}\n" +
-                                          $"Login Time: {UserSession.LoginTime:HH:mm:ss}",
-                                          "Customer Dashboard",
+                                          $"Login Time: {UserSession.LoginTime:HH:mm:ss}\n\n" +
+                                          $"Note: Customer Dashboard will be created next!",
+                                          "Login Success",
                                           MessageBoxButtons.OK,
                                           MessageBoxIcon.Information);
 
-                            // TODO: Open CustomerDashboard form
+                            // TODO: Replace this with CustomerDashboard navigation
                             // CustomerDashboard customerDashboard = new CustomerDashboard();
                             // customerDashboard.Show();
                             // this.Hide();
 
+                            // For now, just clear the form
                             ClearForm();
                         }
                         else
                         {
                             ShowMessage("Invalid password", true);
                             LogLoginAttempt(username, "Customer", false, "Invalid password");
+                            ClearPasswordField();
                         }
                     }
                     else
                     {
                         ShowMessage($"Customer '{username}' not found", true);
                         LogLoginAttempt(username, "Customer", false, "User not found");
+                        ClearPasswordField();
                     }
                 }
             }
             catch (Exception ex)
             {
-                ShowMessage($"Login error: {ex.Message}", true);
+                ShowMessage($"Customer login error: {ex.Message}", true);
                 LogLoginAttempt(username, "Customer", false, $"System error: {ex.Message}");
             }
         }
 
         /// <summary>
-        /// Simple but secure password verification using SHA-256 with secret key
+        /// Verify password using SHA-256 with secret key approach
         /// </summary>
         private bool VerifyPasswordSimple(string inputPassword, byte[] storedHash)
         {
@@ -288,6 +309,7 @@ namespace e_Shift
             }
             catch (Exception ex)
             {
+                // Log error but don't show to user (non-critical)
                 Console.WriteLine($"Failed to update last login: {ex.Message}");
             }
         }
@@ -314,18 +336,23 @@ namespace e_Shift
             }
             catch (Exception ex)
             {
+                // Log error but don't show to user (non-critical)
                 Console.WriteLine($"Failed to log login attempt: {ex.Message}");
             }
         }
 
         private void btnExit_Click(object sender, EventArgs e)
         {
-            Application.Exit();
-        }
+            DialogResult result = MessageBox.Show(
+                "Are you sure you want to exit the application?",
+                "Confirm Exit",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
 
-        private void lblStatus_Click(object sender, EventArgs e)
-        {
-            // Optional: Show detailed status
+            if (result == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
         }
 
         private void txtPassword_KeyPress(object sender, KeyPressEventArgs e)
@@ -344,6 +371,24 @@ namespace e_Shift
             }
         }
 
+        private void rbAdmin_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rbAdmin.Checked)
+            {
+                // Provide helpful hint for admin login
+                ShowMessage("Admin Login Selected - Use admin/admin123", false);
+            }
+        }
+
+        private void rbCustomer_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rbCustomer.Checked)
+            {
+                // Provide helpful hint for customer login
+                ShowMessage("Customer Login Selected - Use CUST001/customer123", false);
+            }
+        }
+
         private void ShowMessage(string message, bool isError)
         {
             try
@@ -352,10 +397,28 @@ namespace e_Shift
                 {
                     lblStatus.Text = message;
                     lblStatus.ForeColor = isError ? System.Drawing.Color.Red : System.Drawing.Color.Green;
+
+                    // Auto-clear error messages after 5 seconds
+                    if (isError && !string.IsNullOrEmpty(message))
+                    {
+                        System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+                        timer.Interval = 5000;
+                        timer.Tick += (s, e) => {
+                            if (lblStatus.ForeColor == System.Drawing.Color.Red)
+                            {
+                                lblStatus.Text = "Ready to login";
+                                lblStatus.ForeColor = System.Drawing.Color.Black;
+                            }
+                            timer.Stop();
+                            timer.Dispose();
+                        };
+                        timer.Start();
+                    }
                 }
             }
             catch
             {
+                // Fallback to MessageBox if label doesn't exist
                 if (!string.IsNullOrEmpty(message))
                 {
                     MessageBox.Show(message, isError ? "Error" : "Status",
@@ -370,8 +433,29 @@ namespace e_Shift
             txtUsername.Clear();
             txtPassword.Clear();
             rbCustomer.Checked = true;
-            ShowMessage("", false);
+            ShowMessage("Ready to login", false);
             txtUsername.Focus();
+        }
+
+        private void ClearPasswordField()
+        {
+            txtPassword.Clear();
+            txtPassword.Focus();
+        }
+
+        // Handle form closing to ensure proper cleanup
+        private void LoginForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Clear any user session when form is closing
+            UserSession.Logout();
+        }
+
+        // Handle when login form is shown again (e.g., after logout)
+        private void LoginForm_Activated(object sender, EventArgs e)
+        {
+            // Clear session and reset form when activated
+            UserSession.Logout();
+            ClearForm();
         }
     }
 }
