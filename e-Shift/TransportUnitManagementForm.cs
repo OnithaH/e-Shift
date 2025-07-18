@@ -23,8 +23,21 @@ namespace e_Shift
         {
             InitializeComponent();
             CheckAdminAccess();
-        }
+            SetupTabs();
 
+        }
+        private void SetupTabs()
+        {
+            // Make sure all tabs are visible
+            if (tabControl1.TabPages.Count < 5)
+            {
+                // If tabs are missing, show a message
+                ShowMessage("Some management tabs are not configured yet", false);
+            }
+
+            // Set the first tab as selected
+            tabControl1.SelectedIndex = 0;
+        }
         private void CheckAdminAccess()
         {
             if (!UserSession.IsLoggedIn || !UserSession.IsAdmin())
@@ -136,26 +149,98 @@ namespace e_Shift
                 txtUnitNumber.Focus();
                 return false;
             }
+
             if (cmbStatusTU.SelectedIndex == -1)
             {
                 ShowMessage("Status is required", true);
                 cmbStatusTU.Focus();
                 return false;
             }
-            if (cmbLorryTU.SelectedValue == null)
+
+            if (cmbLorryTU.SelectedValue == null || Convert.ToInt32(cmbLorryTU.SelectedValue) <= 0)
             {
                 ShowMessage("Lorry selection is required", true);
                 cmbLorryTU.Focus();
                 return false;
             }
-            if (cmbDriverTU.SelectedValue == null)
+
+            if (cmbDriverTU.SelectedValue == null || Convert.ToInt32(cmbDriverTU.SelectedValue) <= 0)
             {
                 ShowMessage("Driver selection is required", true);
                 cmbDriverTU.Focus();
                 return false;
             }
+
+            if (cmbAssistantTU.SelectedValue == null || Convert.ToInt32(cmbAssistantTU.SelectedValue) <= 0)
+            {
+                ShowMessage("Assistant selection is required", true);
+                cmbAssistantTU.Focus();
+                return false;
+            }
+
+            if (cmbContainerTU.SelectedValue == null || Convert.ToInt32(cmbContainerTU.SelectedValue) <= 0)
+            {
+                ShowMessage("Container selection is required", true);
+                cmbContainerTU.Focus();
+                return false;
+            }
+
             return true;
         }
+
+        private void txtSearch_TextChanged(object sender, EventArgs e)
+        {
+            string searchText = ((TextBox)sender).Text.Trim();
+
+            if (string.IsNullOrEmpty(searchText))
+            {
+                LoadTransportUnits(); // Show all
+                return;
+            }
+
+            if (searchText.Length < 2) return; // Wait for at least 2 characters
+
+            try
+            {
+                string query = @"
+            SELECT 
+                tu.TransportUnitID,
+                tu.UnitNumber,
+                tu.Status,
+                tu.IsAvailable,
+                l.RegistrationNumber as LorryReg,
+                CONCAT(d.FirstName, ' ', d.LastName) as DriverName,
+                CONCAT(a.FirstName, ' ', a.LastName) as AssistantName,
+                c.ContainerNumber
+            FROM TransportUnits tu
+            INNER JOIN Lorries l ON tu.LorryID = l.LorryID
+            INNER JOIN Drivers d ON tu.DriverID = d.DriverID
+            INNER JOIN Assistants a ON tu.AssistantID = a.AssistantID
+            INNER JOIN Containers c ON tu.ContainerID = c.ContainerID
+            WHERE tu.IsDeleted = 0 
+            AND (tu.UnitNumber LIKE @Search 
+                OR l.RegistrationNumber LIKE @Search
+                OR d.FirstName LIKE @Search
+                OR d.LastName LIKE @Search)
+            ORDER BY tu.UnitNumber";
+
+                SqlParameter[] parameters = {
+            new SqlParameter("@Search", $"%{searchText}%")
+        };
+
+                DataTable dataTable = DatabaseConnection.FillDataTable(query, parameters);
+                if (dataTable != null)
+                {
+                    dgvTransportUnits.DataSource = dataTable;
+                    FormatTransportUnitsGrid();
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Search error: {ex.Message}", true);
+            }
+        }
+
         #endregion
 
         #region Lorries Management
@@ -224,7 +309,9 @@ namespace e_Shift
             txtRegistrationNumber.Clear();
             txtMake.Clear();
             txtModel.Clear();
-            numYear.Value = 2020;
+            numYear.Minimum = 1980;
+            numYear.Maximum = 2030;
+            numYear.Value = DateTime.Now.Year;
             numLoadCapacity.Value = 0;
             numVolumeCapacity.Value = 0;
             cmbFuelType.SelectedIndex = -1;
@@ -554,9 +641,40 @@ namespace e_Shift
         {
             if (ValidateTransportUnitData())
             {
-                ShowMessage("Transport unit created successfully!", false);
-                LoadTransportUnits();
-                ClearTransportUnitForm();
+                try
+                {
+                    string query = @"INSERT INTO TransportUnits (UnitNumber, LorryID, DriverID, AssistantID, ContainerID, Status, IsAvailable, CreatedDate, ModifiedDate, IsDeleted) 
+                           VALUES (@UnitNumber, @LorryID, @DriverID, @AssistantID, @ContainerID, @Status, @IsAvailable, @CreatedDate, @ModifiedDate, 0)";
+
+                    SqlParameter[] parameters = {
+                new SqlParameter("@UnitNumber", txtUnitNumber.Text.Trim()),
+                new SqlParameter("@LorryID", Convert.ToInt32(cmbLorryTU.SelectedValue)),
+                new SqlParameter("@DriverID", Convert.ToInt32(cmbDriverTU.SelectedValue)),
+                new SqlParameter("@AssistantID", Convert.ToInt32(cmbAssistantTU.SelectedValue)),
+                new SqlParameter("@ContainerID", Convert.ToInt32(cmbContainerTU.SelectedValue)),
+                new SqlParameter("@Status", cmbStatusTU.Text),
+                new SqlParameter("@IsAvailable", chkIsAvailableUnit.Checked),
+                new SqlParameter("@CreatedDate", DateTime.Now),
+                new SqlParameter("@ModifiedDate", DateTime.Now)
+            };
+
+                    int result = DatabaseConnection.ExecuteNonQuery(query, parameters);
+                    if (result > 0)
+                    {
+                        ShowMessage("Transport unit created successfully!", false);
+                        LoadTransportUnits();
+                        LoadComboBoxData(); // Refresh combo boxes to show updated availability
+                        ClearTransportUnitForm();
+                    }
+                    else
+                    {
+                        ShowMessage("Failed to create transport unit", true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ShowMessage($"Error creating transport unit: {ex.Message}", true);
+                }
             }
         }
 
@@ -564,8 +682,51 @@ namespace e_Shift
         {
             if (selectedTransportUnitID > 0 && ValidateTransportUnitData())
             {
-                ShowMessage("Transport unit updated successfully!", false);
-                LoadTransportUnits();
+                try
+                {
+                    string query = @"UPDATE TransportUnits SET 
+                           UnitNumber = @UnitNumber, 
+                           LorryID = @LorryID, 
+                           DriverID = @DriverID, 
+                           AssistantID = @AssistantID, 
+                           ContainerID = @ContainerID, 
+                           Status = @Status, 
+                           IsAvailable = @IsAvailable, 
+                           ModifiedDate = @ModifiedDate 
+                           WHERE TransportUnitID = @TransportUnitID";
+
+                    SqlParameter[] parameters = {
+                new SqlParameter("@UnitNumber", txtUnitNumber.Text.Trim()),
+                new SqlParameter("@LorryID", Convert.ToInt32(cmbLorryTU.SelectedValue)),
+                new SqlParameter("@DriverID", Convert.ToInt32(cmbDriverTU.SelectedValue)),
+                new SqlParameter("@AssistantID", Convert.ToInt32(cmbAssistantTU.SelectedValue)),
+                new SqlParameter("@ContainerID", Convert.ToInt32(cmbContainerTU.SelectedValue)),
+                new SqlParameter("@Status", cmbStatusTU.Text),
+                new SqlParameter("@IsAvailable", chkIsAvailableUnit.Checked),
+                new SqlParameter("@ModifiedDate", DateTime.Now),
+                new SqlParameter("@TransportUnitID", selectedTransportUnitID)
+                };
+
+                    int result = DatabaseConnection.ExecuteNonQuery(query, parameters);
+                    if (result > 0)
+                    {
+                        ShowMessage("Transport unit updated successfully!", false);
+                        LoadTransportUnits();
+                        LoadComboBoxData(); // Refresh combo boxes
+                    }
+                    else
+                    {
+                        ShowMessage("Failed to update transport unit", true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ShowMessage($"Error updating transport unit: {ex.Message}", true);
+                }
+            }
+            else if (selectedTransportUnitID <= 0)
+            {
+                ShowMessage("Please select a transport unit to update", true);
             }
         }
 
@@ -573,16 +734,48 @@ namespace e_Shift
         {
             if (selectedTransportUnitID > 0)
             {
-                DialogResult result = MessageBox.Show("Are you sure you want to delete this transport unit?",
-                    "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                DialogResult result = MessageBox.Show(
+                    "Are you sure you want to delete this transport unit?\n\nThis will mark it as deleted but preserve the record.",
+                    "Confirm Delete",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
                 if (result == DialogResult.Yes)
                 {
-                    ShowMessage("Transport unit deleted successfully!", false);
-                    LoadTransportUnits();
-                    ClearTransportUnitForm();
+                    try
+                    {
+                        string query = @"UPDATE TransportUnits SET IsDeleted = 1, ModifiedDate = @ModifiedDate WHERE TransportUnitID = @TransportUnitID";
+                        SqlParameter[] parameters = {
+                    new SqlParameter("@ModifiedDate", DateTime.Now),
+                    new SqlParameter("@TransportUnitID", selectedTransportUnitID)
+                };
+
+                        int deleteResult = DatabaseConnection.ExecuteNonQuery(query, parameters);
+                        if (deleteResult > 0)
+                        {
+                            ShowMessage("Transport unit deleted successfully!", false);
+                            LoadTransportUnits();
+                            LoadComboBoxData(); // Refresh combo boxes
+                            ClearTransportUnitForm();
+                        }
+                        else
+                        {
+                            ShowMessage("Failed to delete transport unit", true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowMessage($"Error deleting transport unit: {ex.Message}", true);
+                    }
                 }
             }
+            else
+            {
+                ShowMessage("Please select a transport unit to delete", true);
+            }
         }
+
+
 
         // Lorry Events
         private void btnAddLorry_Click(object sender, EventArgs e)
@@ -699,6 +892,8 @@ namespace e_Shift
             }
         }
 
+
+
         // Driver Events
         private void btnAddDriver_Click(object sender, EventArgs e)
         {
@@ -736,6 +931,9 @@ namespace e_Shift
                 }
             }
         }
+
+
+
 
         // Assistant Events
         private void btnAddAssistant_Click(object sender, EventArgs e)
@@ -847,6 +1045,9 @@ namespace e_Shift
             }
         }
 
+
+
+
         // Container Events
         private void btnAddContainer_Click(object sender, EventArgs e)
         {
@@ -950,6 +1151,9 @@ namespace e_Shift
                 }
             }
         }
+
+
+
 
         // General Events
         private void btnRefresh_Click(object sender, EventArgs e)

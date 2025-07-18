@@ -154,13 +154,19 @@ namespace e_Shift
 
         private void btnTransportManagement_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Transport Management form will be created later!\n\n" +
-                          "This will allow you to:\n" +
-                          "• Manage lorries\n" +
-                          "• Manage drivers\n" +
-                          "• Manage assistants\n" +
-                          "• Manage containers",
-                          "Coming Soon", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                // Open Transport Unit Management form
+                TransportUnitManagementForm transportForm = new TransportUnitManagementForm();
+                transportForm.ShowDialog();
+
+                // Refresh dashboard statistics after transport management
+                LoadDashboardData();
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error opening transport management: {ex.Message}", true);
+            }
         }
 
         private void btnReports_Click(object sender, EventArgs e)
@@ -348,7 +354,8 @@ namespace e_Shift
             }
         }
 
-        // Helper method to replace Microsoft.VisualBasic.Interaction.InputBox
+
+
         private string PromptForInput(string prompt, string title)
         {
             Form promptForm = new Form()

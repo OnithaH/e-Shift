@@ -411,6 +411,30 @@
             this.btnClose.UseVisualStyleBackColor = false;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
 
+            // Search components
+            this.lblSearch = new System.Windows.Forms.Label();
+            this.txtSearch = new System.Windows.Forms.TextBox();
+
+            // Search Label
+            this.lblSearch.AutoSize = true;
+            this.lblSearch.Location = new System.Drawing.Point(60, 140);
+            this.lblSearch.Name = "lblSearch";
+            this.lblSearch.Size = new System.Drawing.Size(53, 20);
+            this.lblSearch.TabIndex = 100;
+            this.lblSearch.Text = "Search:";
+
+            // Search TextBox
+            this.txtSearch.Location = new System.Drawing.Point(120, 137);
+            this.txtSearch.Name = "txtSearch";
+            this.txtSearch.PlaceholderText = "Search units...";
+            this.txtSearch.Size = new System.Drawing.Size(200, 27);
+            this.txtSearch.TabIndex = 101;
+            this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
+
+            // Add to form
+            this.Controls.Add(this.lblSearch);
+            this.Controls.Add(this.txtSearch);
+
             this.tabControl1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -544,5 +568,8 @@
         private System.Windows.Forms.Button btnAddContainer;
         private System.Windows.Forms.Button btnUpdateContainer;
         private System.Windows.Forms.Button btnDeleteContainer;
+
+        private System.Windows.Forms.Label lblSearch;
+        private System.Windows.Forms.TextBox txtSearch;
     }
 }
