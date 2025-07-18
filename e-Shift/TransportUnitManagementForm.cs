@@ -5,13 +5,12 @@ using System;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace e_Shift
 {
     public partial class TransportUnitManagementForm : Form
     {
-        #region Private Fields - DECLARE ONLY ONCE
+        #region Private Fields
         private int selectedTransportUnitID = 0;
         private int selectedLorryID = 0;
         private int selectedDriverID = 0;
@@ -26,310 +25,15 @@ namespace e_Shift
             CheckAdminAccess();
         }
 
-        private void btnUpdateAssistant_Click(object sender, EventArgs e)
+        private void CheckAdminAccess()
         {
-            if (selectedAssistantID > 0 && ValidateAssistantData())
+            if (!UserSession.IsLoggedIn || !UserSession.IsAdmin())
             {
-                // Implementation for updating assistant
-                ShowMessage("Assistant updated successfully!", false);
-                LoadAssistants();
-                LoadComboBoxData();
+                MessageBox.Show("Access denied! Admin privileges required.", "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+                return;
             }
         }
-
-        private void btnDeleteAssistant_Click(object sender, EventArgs e)
-        {
-            if (selectedAssistantID > 0)
-            {
-                DialogResult result = MessageBox.Show("Are you sure you want to delete this assistant?",
-                    "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (result == DialogResult.Yes)
-                {
-                    // Implementation for deleting assistant
-                    ShowMessage("Assistant deleted successfully!", false);
-                    LoadAssistants();
-                    LoadComboBoxData();
-                    ClearAssistantForm();
-                }
-            }
-        }
-
-        // Container Events
-        private void btnAddContainer_Click(object sender, EventArgs e)
-        {
-            if (ValidateContainerData())
-            {
-                // Implementation for adding container
-                ShowMessage("Container added successfully!", false);
-                LoadContainers();
-                LoadComboBoxData();
-                ClearContainerForm();
-            }
-        }
-
-        private void btnUpdateContainer_Click(object sender, EventArgs e)
-        {
-            if (selectedContainerID > 0 && ValidateContainerData())
-            {
-                // Implementation for updating container
-                ShowMessage("Container updated successfully!", false);
-                LoadContainers();
-                LoadComboBoxData();
-            }
-        }
-
-        private void btnDeleteContainer_Click(object sender, EventArgs e)
-        {
-            if (selectedContainerID > 0)
-            {
-                DialogResult result = MessageBox.Show("Are you sure you want to delete this container?",
-                    "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                if (result == DialogResult.Yes)
-                {
-                    // Implementation for deleting container
-                    ShowMessage("Container deleted successfully!", false);
-                    LoadContainers();
-                    LoadComboBoxData();
-                    ClearContainerForm();
-                }
-            }
-        }
-
-        // General Events
-        private void btnRefresh_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                LoadAllData();
-                ShowMessage("Data refreshed successfully!", false);
-            }
-            catch (Exception ex)
-            {
-                ShowMessage($"Error refreshing data: {ex.Message}", true);
-            }
-        }
-
-        private void btnClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-        #endregion
-
-        #region DataGridView Event Handlers - DEFINE ONLY ONCE EACH
-        private void dgvTransportUnits_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                try
-                {
-                    DataGridViewRow row = dgvTransportUnits.Rows[e.RowIndex];
-                    selectedTransportUnitID = Convert.ToInt32(row.Cells["TransportUnitID"].Value);
-                    LoadTransportUnitDetails(selectedTransportUnitID);
-                }
-                catch (Exception ex)
-                {
-                    ShowMessage($"Error selecting transport unit: {ex.Message}", true);
-                }
-            }
-        }
-
-        private void dgvLorries_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                try
-                {
-                    DataGridViewRow row = dgvLorries.Rows[e.RowIndex];
-                    selectedLorryID = Convert.ToInt32(row.Cells["LorryID"].Value);
-                    LoadLorryDetails(selectedLorryID);
-                }
-                catch (Exception ex)
-                {
-                    ShowMessage($"Error selecting lorry: {ex.Message}", true);
-                }
-            }
-        }
-
-        private void dgvDrivers_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                try
-                {
-                    DataGridViewRow row = dgvDrivers.Rows[e.RowIndex];
-                    selectedDriverID = Convert.ToInt32(row.Cells["DriverID"].Value);
-                    LoadDriverDetails(selectedDriverID);
-                }
-                catch (Exception ex)
-                {
-                    ShowMessage($"Error selecting driver: {ex.Message}", true);
-                }
-            }
-        }
-
-        private void dgvAssistants_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                try
-                {
-                    DataGridViewRow row = dgvAssistants.Rows[e.RowIndex];
-                    selectedAssistantID = Convert.ToInt32(row.Cells["AssistantID"].Value);
-                    LoadAssistantDetails(selectedAssistantID);
-                }
-                catch (Exception ex)
-                {
-                    ShowMessage($"Error selecting assistant: {ex.Message}", true);
-                }
-            }
-        }
-
-        private void dgvContainers_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                try
-                {
-                    DataGridViewRow row = dgvContainers.Rows[e.RowIndex];
-                    selectedContainerID = Convert.ToInt32(row.Cells["ContainerID"].Value);
-                    LoadContainerDetails(selectedContainerID);
-                }
-                catch (Exception ex)
-                {
-                    ShowMessage($"Error selecting container: {ex.Message}", true);
-                }
-            }
-        }
-        #endregion
-
-        #region Helper Methods - DEFINE ONLY ONCE EACH
-        private void LoadComboBoxData()
-        {
-            try
-            {
-                // Load Lorries into combo box
-                string lorryQuery = "SELECT LorryID, RegistrationNumber FROM Lorries WHERE IsDeleted = 0 AND IsAvailable = 1";
-                DataTable lorryData = DatabaseConnection.FillDataTable(lorryQuery);
-                if (lorryData != null)
-                {
-                    cmbLorryTU.DataSource = lorryData;
-                    cmbLorryTU.DisplayMember = "RegistrationNumber";
-                    cmbLorryTU.ValueMember = "LorryID";
-                    cmbLorryTU.SelectedIndex = -1;
-                }
-
-                // Load Drivers into combo box
-                string driverQuery = "SELECT DriverID, CONCAT(FirstName, ' ', LastName) as DriverName FROM Drivers WHERE IsDeleted = 0 AND IsAvailable = 1";
-                DataTable driverData = DatabaseConnection.FillDataTable(driverQuery);
-                if (driverData != null)
-                {
-                    cmbDriverTU.DataSource = driverData;
-                    cmbDriverTU.DisplayMember = "DriverName";
-                    cmbDriverTU.ValueMember = "DriverID";
-                    cmbDriverTU.SelectedIndex = -1;
-                }
-
-                // Load Assistants into combo box
-                string assistantQuery = "SELECT AssistantID, CONCAT(FirstName, ' ', LastName) as AssistantName FROM Assistants WHERE IsDeleted = 0 AND IsAvailable = 1";
-                DataTable assistantData = DatabaseConnection.FillDataTable(assistantQuery);
-                if (assistantData != null)
-                {
-                    cmbAssistantTU.DataSource = assistantData;
-                    cmbAssistantTU.DisplayMember = "AssistantName";
-                    cmbAssistantTU.ValueMember = "AssistantID";
-                    cmbAssistantTU.SelectedIndex = -1;
-                }
-
-                // Load Containers into combo box
-                string containerQuery = "SELECT ContainerID, ContainerNumber FROM Containers WHERE IsDeleted = 0 AND IsAvailable = 1";
-                DataTable containerData = DatabaseConnection.FillDataTable(containerQuery);
-                if (containerData != null)
-                {
-                    cmbContainerTU.DataSource = containerData;
-                    cmbContainerTU.DisplayMember = "ContainerNumber";
-                    cmbContainerTU.ValueMember = "ContainerID";
-                    cmbContainerTU.SelectedIndex = -1;
-                }
-
-                // Setup static combo boxes
-                SetupStaticComboBoxes();
-            }
-            catch (Exception ex)
-            {
-                ShowMessage($"Error loading combo box data: {ex.Message}", true);
-            }
-        }
-
-        private void SetupStaticComboBoxes()
-        {
-            // Fuel Type combo box
-            cmbFuelType.Items.Clear();
-            cmbFuelType.Items.AddRange(new string[] { "Petrol", "Diesel", "Electric", "Hybrid" });
-
-            // Status combo boxes
-            cmbStatusTU.Items.Clear();
-            cmbStatusTU.Items.AddRange(new string[] { "Active", "Inactive", "Maintenance" });
-
-            cmbStatusLorry.Items.Clear();
-            cmbStatusLorry.Items.AddRange(new string[] { "Active", "Inactive", "Maintenance", "Out of Service" });
-
-            cmbStatusContainer.Items.Clear();
-            cmbStatusContainer.Items.AddRange(new string[] { "Available", "In Use", "Maintenance", "Out of Service" });
-
-            // License Class combo box
-            cmbLicenseClass.Items.Clear();
-            cmbLicenseClass.Items.AddRange(new string[] { "Class A", "Class B", "Class C", "CDL" });
-
-            // Container Type combo box
-            cmbContainerType.Items.Clear();
-            cmbContainerType.Items.AddRange(new string[] { "Dry", "Refrigerated", "Tank", "Flatbed" });
-        }
-
-        private void LoadTransportUnitDetails(int transportUnitID)
-        {
-            try
-            {
-                string query = @"SELECT * FROM TransportUnits WHERE TransportUnitID = @TransportUnitID";
-                SqlParameter[] parameters = { new SqlParameter("@TransportUnitID", transportUnitID) };
-
-                using (SqlDataReader reader = DatabaseConnection.ExecuteReader(query, parameters))
-                {
-                    if (reader != null && reader.Read())
-                    {
-                        txtUnitNumber.Text = reader["UnitNumber"].ToString();
-                        cmbStatusTU.Text = reader["Status"].ToString();
-                        cmbLorryTU.SelectedValue = reader["LorryID"];
-                        cmbDriverTU.SelectedValue = reader["DriverID"];
-                        cmbAssistantTU.SelectedValue = reader["AssistantID"];
-                        cmbContainerTU.SelectedValue = reader["ContainerID"];
-                        chkIsAvailableUnit.Checked = Convert.ToBoolean(reader["IsAvailable"]);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowMessage($"Error loading transport unit details: {ex.Message}", true);
-            }
-        }
-
-        private void ShowMessage(string message, bool isError)
-        {
-            if (isError)
-            {
-                MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                lblStatus.Text = $"Error: {message}";
-                lblStatus.ForeColor = Color.Red;
-            }
-            else
-            {
-                MessageBox.Show(message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                lblStatus.Text = message;
-                lblStatus.ForeColor = Color.Green;
-            }
-        }
-        #endregion
-
-
 
         private void TransportUnitManagementForm_Load(object sender, EventArgs e)
         {
@@ -361,7 +65,7 @@ namespace e_Shift
             ClearAssistantForm();
             ClearContainerForm();
         }
-
+        #endregion
 
         #region Transport Units Management
         private void LoadTransportUnits()
@@ -803,8 +507,8 @@ namespace e_Shift
                     if (reader != null && reader.Read())
                     {
                         txtContainerNumber.Text = reader["ContainerNumber"].ToString();
-                        cmbContainerType.Text = reader["Type"].ToString();
-                        numContainerCapacity.Value = Convert.ToDecimal(reader["Capacity"]);
+                        cmbType.Text = reader["Type"].ToString();
+                        numCapacity.Value = Convert.ToDecimal(reader["Capacity"]);
                         cmbStatusContainer.Text = reader["Status"].ToString();
                         chkIsAvailableContainer.Checked = Convert.ToBoolean(reader["IsAvailable"]);
                     }
@@ -820,8 +524,8 @@ namespace e_Shift
         {
             selectedContainerID = 0;
             txtContainerNumber.Clear();
-            cmbContainerType.SelectedIndex = -1;
-            numContainerCapacity.Value = 0;
+            cmbType.SelectedIndex = -1;
+            numCapacity.Value = 0;
             cmbStatusContainer.SelectedIndex = 0;
             chkIsAvailableContainer.Checked = true;
         }
@@ -834,24 +538,22 @@ namespace e_Shift
                 txtContainerNumber.Focus();
                 return false;
             }
-            if (cmbContainerType.SelectedIndex == -1)
+            if (cmbType.SelectedIndex == -1)
             {
                 ShowMessage("Container Type is required", true);
-                cmbContainerType.Focus();
+                cmbType.Focus();
                 return false;
             }
             return true;
         }
         #endregion
 
-        #region Button Event Handlers - DEFINE ONLY ONCE EACH
-
+        #region Button Event Handlers
         // Transport Unit Events
         private void btnCreateTransportUnit_Click(object sender, EventArgs e)
         {
             if (ValidateTransportUnitData())
             {
-                // Implementation for creating transport unit
                 ShowMessage("Transport unit created successfully!", false);
                 LoadTransportUnits();
                 ClearTransportUnitForm();
@@ -862,7 +564,6 @@ namespace e_Shift
         {
             if (selectedTransportUnitID > 0 && ValidateTransportUnitData())
             {
-                // Implementation for updating transport unit
                 ShowMessage("Transport unit updated successfully!", false);
                 LoadTransportUnits();
             }
@@ -876,7 +577,6 @@ namespace e_Shift
                     "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    // Implementation for deleting transport unit
                     ShowMessage("Transport unit deleted successfully!", false);
                     LoadTransportUnits();
                     ClearTransportUnitForm();
@@ -1004,7 +704,6 @@ namespace e_Shift
         {
             if (ValidateDriverData())
             {
-                // Implementation for adding driver
                 ShowMessage("Driver added successfully!", false);
                 LoadDrivers();
                 LoadComboBoxData();
@@ -1016,7 +715,6 @@ namespace e_Shift
         {
             if (selectedDriverID > 0 && ValidateDriverData())
             {
-                // Implementation for updating driver
                 ShowMessage("Driver updated successfully!", false);
                 LoadDrivers();
                 LoadComboBoxData();
@@ -1031,25 +729,11 @@ namespace e_Shift
                     "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    // Implementation for deleting driver
                     ShowMessage("Driver deleted successfully!", false);
                     LoadDrivers();
                     LoadComboBoxData();
                     ClearDriverForm();
                 }
-            }
-        }
-
-        // Assistant Events
-        private void btnAddAssistant_Click(object sender, EventArgs e)
-        {
-            if (ValidateAssistantData())
-            {
-                // Implementation for adding assistant
-                ShowMessage("Assistant added successfully!", false);
-                LoadAssistants();
-                LoadComboBoxData();
-                ClearAssistantForm();
             }
         }
 
@@ -1175,8 +859,8 @@ namespace e_Shift
 
                     SqlParameter[] parameters = {
                         new SqlParameter("@ContainerNumber", txtContainerNumber.Text.Trim()),
-                        new SqlParameter("@Type", cmbContainerType.Text),
-                        new SqlParameter("@Capacity", numContainerCapacity.Value),
+                        new SqlParameter("@Type", cmbType.Text),
+                        new SqlParameter("@Capacity", numCapacity.Value),
                         new SqlParameter("@Status", cmbStatusContainer.Text),
                         new SqlParameter("@IsAvailable", chkIsAvailableContainer.Checked),
                         new SqlParameter("@CreatedDate", DateTime.Now),
@@ -1211,8 +895,8 @@ namespace e_Shift
 
                     SqlParameter[] parameters = {
                         new SqlParameter("@ContainerNumber", txtContainerNumber.Text.Trim()),
-                        new SqlParameter("@Type", cmbContainerType.Text),
-                        new SqlParameter("@Capacity", numContainerCapacity.Value),
+                        new SqlParameter("@Type", cmbType.Text),
+                        new SqlParameter("@Capacity", numCapacity.Value),
                         new SqlParameter("@Status", cmbStatusContainer.Text),
                         new SqlParameter("@IsAvailable", chkIsAvailableContainer.Checked),
                         new SqlParameter("@ModifiedDate", DateTime.Now),
@@ -1374,7 +1058,6 @@ namespace e_Shift
         }
         #endregion
 
-
         #region Helper Methods
         private void LoadComboBoxData()
         {
@@ -1454,8 +1137,8 @@ namespace e_Shift
             cmbLicenseClass.Items.AddRange(new string[] { "Class A", "Class B", "Class C", "CDL" });
 
             // Container Type combo box
-            cmbContainerType.Items.Clear();
-            cmbContainerType.Items.AddRange(new string[] { "Dry", "Refrigerated", "Tank", "Flatbed" });
+            cmbType.Items.Clear();
+            cmbType.Items.AddRange(new string[] { "Dry", "Refrigerated", "Tank", "Flatbed" });
         }
 
         private void LoadTransportUnitDetails(int transportUnitID)
@@ -1498,16 +1181,6 @@ namespace e_Shift
                 MessageBox.Show(message, "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 lblStatus.Text = message;
                 lblStatus.ForeColor = Color.Green;
-            }
-        }
-
-        private void CheckAdminAccess()
-        {
-            if (!UserSession.IsLoggedIn || !UserSession.IsAdmin())
-            {
-                MessageBox.Show("Access denied! Admin privileges required.", "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                this.Close();
-                return;
             }
         }
         #endregion
