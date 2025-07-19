@@ -41,8 +41,11 @@
             lblDeclineReason = new Label();
             txtEstimatedCost = new TextBox();
             lblEstimatedCost = new Label();
-            btnDecline = new Button();
             btnApprove = new Button();
+            btnDecline = new Button();
+            lblTransportUnit = new Label();
+            cmbTransportUnit = new ComboBox();
+            lblCapacityInfo = new Label();
             lblStatus = new Label();
             btnClose = new Button();
             groupBoxLoadInfo = new GroupBox();
@@ -119,7 +122,7 @@
             comboBoxFilterStatus.Items.AddRange(new object[] { "All", "Pending", "Approved", "InProgress", "Completed", "Declined" });
             comboBoxFilterStatus.Location = new Point(90, 22);
             comboBoxFilterStatus.Name = "comboBoxFilterStatus";
-            comboBoxFilterStatus.Size = new Size(230, 31);
+            comboBoxFilterStatus.Size = new Size(297, 31);
             comboBoxFilterStatus.TabIndex = 1;
             comboBoxFilterStatus.SelectedIndexChanged += comboBoxFilterStatus_SelectedIndexChanged;
             // 
@@ -173,7 +176,7 @@
             groupBoxJobDetails.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             groupBoxJobDetails.Location = new Point(30, 400);
             groupBoxJobDetails.Name = "groupBoxJobDetails";
-            groupBoxJobDetails.Size = new Size(441, 200);
+            groupBoxJobDetails.Size = new Size(467, 200);
             groupBoxJobDetails.TabIndex = 3;
             groupBoxJobDetails.TabStop = false;
             groupBoxJobDetails.Text = "Job Details";
@@ -257,15 +260,19 @@
             groupBoxActions.Controls.Add(lblDeclineReason);
             groupBoxActions.Controls.Add(txtEstimatedCost);
             groupBoxActions.Controls.Add(lblEstimatedCost);
-            groupBoxActions.Controls.Add(btnDecline);
             groupBoxActions.Controls.Add(btnApprove);
+            groupBoxActions.Controls.Add(btnDecline);
+            groupBoxActions.Controls.Add(lblTransportUnit);
+            groupBoxActions.Controls.Add(cmbTransportUnit);
+            groupBoxActions.Controls.Add(lblCapacityInfo);
             groupBoxActions.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            groupBoxActions.Location = new Point(543, 400);
+            groupBoxActions.Location = new Point(503, 400);
             groupBoxActions.Name = "groupBoxActions";
-            groupBoxActions.Size = new Size(394, 200);
+            groupBoxActions.Size = new Size(434, 312);
             groupBoxActions.TabIndex = 4;
             groupBoxActions.TabStop = false;
             groupBoxActions.Text = "Actions";
+            groupBoxActions.Enter += groupBoxActions_Enter;
             // 
             // comboBoxNewStatus
             // 
@@ -273,7 +280,7 @@
             comboBoxNewStatus.Font = new Font("Segoe UI", 9F);
             comboBoxNewStatus.FormattingEnabled = true;
             comboBoxNewStatus.Items.AddRange(new object[] { "Approved", "InProgress", "Completed" });
-            comboBoxNewStatus.Location = new Point(80, 167);
+            comboBoxNewStatus.Location = new Point(74, 170);
             comboBoxNewStatus.Name = "comboBoxNewStatus";
             comboBoxNewStatus.Size = new Size(120, 28);
             comboBoxNewStatus.TabIndex = 8;
@@ -283,7 +290,7 @@
             // 
             lblNewStatus.AutoSize = true;
             lblNewStatus.Font = new Font("Segoe UI", 9F);
-            lblNewStatus.Location = new Point(20, 170);
+            lblNewStatus.Location = new Point(16, 177);
             lblNewStatus.Name = "lblNewStatus";
             lblNewStatus.Size = new Size(52, 20);
             lblNewStatus.TabIndex = 7;
@@ -293,9 +300,9 @@
             // 
             btnUpdateStatus.BackColor = Color.LightBlue;
             btnUpdateStatus.Font = new Font("Segoe UI", 9F);
-            btnUpdateStatus.Location = new Point(220, 165);
+            btnUpdateStatus.Location = new Point(226, 170);
             btnUpdateStatus.Name = "btnUpdateStatus";
-            btnUpdateStatus.Size = new Size(103, 30);
+            btnUpdateStatus.Size = new Size(159, 35);
             btnUpdateStatus.TabIndex = 6;
             btnUpdateStatus.Text = "Update";
             btnUpdateStatus.UseVisualStyleBackColor = false;
@@ -304,7 +311,7 @@
             // txtDeclineReason
             // 
             txtDeclineReason.Font = new Font("Segoe UI", 9F);
-            txtDeclineReason.Location = new Point(20, 135);
+            txtDeclineReason.Location = new Point(148, 82);
             txtDeclineReason.Name = "txtDeclineReason";
             txtDeclineReason.Size = new Size(280, 27);
             txtDeclineReason.TabIndex = 5;
@@ -313,7 +320,7 @@
             // 
             lblDeclineReason.AutoSize = true;
             lblDeclineReason.Font = new Font("Segoe UI", 10F);
-            lblDeclineReason.Location = new Point(20, 110);
+            lblDeclineReason.Location = new Point(14, 86);
             lblDeclineReason.Name = "lblDeclineReason";
             lblDeclineReason.Size = new Size(130, 23);
             lblDeclineReason.TabIndex = 4;
@@ -322,38 +329,26 @@
             // txtEstimatedCost
             // 
             txtEstimatedCost.Font = new Font("Segoe UI", 10F);
-            txtEstimatedCost.Location = new Point(150, 72);
+            txtEstimatedCost.Location = new Point(150, 33);
             txtEstimatedCost.Name = "txtEstimatedCost";
-            txtEstimatedCost.Size = new Size(100, 30);
+            txtEstimatedCost.Size = new Size(137, 30);
             txtEstimatedCost.TabIndex = 3;
             // 
             // lblEstimatedCost
             // 
             lblEstimatedCost.AutoSize = true;
             lblEstimatedCost.Font = new Font("Segoe UI", 10F);
-            lblEstimatedCost.Location = new Point(20, 75);
+            lblEstimatedCost.Location = new Point(16, 36);
             lblEstimatedCost.Name = "lblEstimatedCost";
             lblEstimatedCost.Size = new Size(128, 23);
             lblEstimatedCost.TabIndex = 2;
             lblEstimatedCost.Text = "Estimated Cost:";
             // 
-            // btnDecline
-            // 
-            btnDecline.BackColor = Color.LightCoral;
-            btnDecline.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnDecline.Location = new Point(179, 25);
-            btnDecline.Name = "btnDecline";
-            btnDecline.Size = new Size(170, 35);
-            btnDecline.TabIndex = 1;
-            btnDecline.Text = "❌ Decline";
-            btnDecline.UseVisualStyleBackColor = false;
-            btnDecline.Click += btnDecline_Click;
-            // 
             // btnApprove
             // 
             btnApprove.BackColor = Color.LightGreen;
             btnApprove.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnApprove.Location = new Point(20, 25);
+            btnApprove.Location = new Point(41, 218);
             btnApprove.Name = "btnApprove";
             btnApprove.Size = new Size(153, 35);
             btnApprove.TabIndex = 0;
@@ -361,11 +356,53 @@
             btnApprove.UseVisualStyleBackColor = false;
             btnApprove.Click += btnApprove_Click;
             // 
+            // btnDecline
+            // 
+            btnDecline.BackColor = Color.LightCoral;
+            btnDecline.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            btnDecline.Location = new Point(226, 218);
+            btnDecline.Name = "btnDecline";
+            btnDecline.Size = new Size(170, 35);
+            btnDecline.TabIndex = 1;
+            btnDecline.Text = "❌ Decline";
+            btnDecline.UseVisualStyleBackColor = false;
+            btnDecline.Click += btnDecline_Click;
+            // 
+            // lblTransportUnit
+            // 
+            lblTransportUnit.AutoSize = true;
+            lblTransportUnit.Font = new Font("Segoe UI", 9F);
+            lblTransportUnit.Location = new Point(14, 127);
+            lblTransportUnit.Name = "lblTransportUnit";
+            lblTransportUnit.Size = new Size(152, 20);
+            lblTransportUnit.TabIndex = 9;
+            lblTransportUnit.Text = "Assign Transport Unit:";
+            lblTransportUnit.Click += lblTransportUnit_Click;
+            // 
+            // cmbTransportUnit
+            // 
+            cmbTransportUnit.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbTransportUnit.Font = new Font("Segoe UI", 9F);
+            cmbTransportUnit.Location = new Point(178, 119);
+            cmbTransportUnit.Name = "cmbTransportUnit";
+            cmbTransportUnit.Size = new Size(250, 28);
+            cmbTransportUnit.TabIndex = 10;
+            cmbTransportUnit.SelectedIndexChanged += cmbTransportUnit_SelectedIndexChanged;
+            // 
+            // lblCapacityInfo
+            // 
+            lblCapacityInfo.AutoSize = true;
+            lblCapacityInfo.Font = new Font("Segoe UI", 8F);
+            lblCapacityInfo.Location = new Point(130, 145);
+            lblCapacityInfo.Name = "lblCapacityInfo";
+            lblCapacityInfo.Size = new Size(0, 19);
+            lblCapacityInfo.TabIndex = 11;
+            // 
             // lblStatus
             // 
             lblStatus.AutoSize = true;
             lblStatus.Font = new Font("Segoe UI", 10F);
-            lblStatus.Location = new Point(30, 712);
+            lblStatus.Location = new Point(30, 784);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(56, 23);
             lblStatus.TabIndex = 5;
@@ -375,7 +412,7 @@
             // 
             btnClose.BackColor = Color.LightGray;
             btnClose.Font = new Font("Segoe UI", 10F);
-            btnClose.Location = new Point(802, 618);
+            btnClose.Location = new Point(802, 743);
             btnClose.Name = "btnClose";
             btnClose.Size = new Size(115, 53);
             btnClose.TabIndex = 6;
@@ -394,9 +431,9 @@
             groupBoxLoadInfo.Controls.Add(lblLoadCost);
             groupBoxLoadInfo.Controls.Add(lblCostValue);
             groupBoxLoadInfo.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            groupBoxLoadInfo.Location = new Point(30, 606);
+            groupBoxLoadInfo.Location = new Point(30, 612);
             groupBoxLoadInfo.Name = "groupBoxLoadInfo";
-            groupBoxLoadInfo.Size = new Size(726, 100);
+            groupBoxLoadInfo.Size = new Size(467, 100);
             groupBoxLoadInfo.TabIndex = 8;
             groupBoxLoadInfo.TabStop = false;
             groupBoxLoadInfo.Text = "📦 Load Information";
@@ -419,7 +456,7 @@
             txtLoadDetails.Multiline = true;
             txtLoadDetails.Name = "txtLoadDetails";
             txtLoadDetails.ReadOnly = true;
-            txtLoadDetails.Size = new Size(650, 25);
+            txtLoadDetails.Size = new Size(371, 25);
             txtLoadDetails.TabIndex = 1;
             // 
             // lblLoadWeight
@@ -447,7 +484,7 @@
             // 
             lblLoadVolume.AutoSize = true;
             lblLoadVolume.Font = new Font("Segoe UI", 9F);
-            lblLoadVolume.Location = new Point(200, 60);
+            lblLoadVolume.Location = new Point(184, 60);
             lblLoadVolume.Name = "lblLoadVolume";
             lblLoadVolume.Size = new Size(62, 20);
             lblLoadVolume.TabIndex = 4;
@@ -458,7 +495,7 @@
             lblVolumeValue.AutoSize = true;
             lblVolumeValue.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             lblVolumeValue.ForeColor = Color.DarkBlue;
-            lblVolumeValue.Location = new Point(265, 60);
+            lblVolumeValue.Location = new Point(252, 60);
             lblVolumeValue.Name = "lblVolumeValue";
             lblVolumeValue.Size = new Size(18, 20);
             lblVolumeValue.TabIndex = 5;
@@ -468,7 +505,7 @@
             // 
             lblLoadCost.AutoSize = true;
             lblLoadCost.Font = new Font("Segoe UI", 9F);
-            lblLoadCost.Location = new Point(400, 60);
+            lblLoadCost.Location = new Point(369, 60);
             lblLoadCost.Name = "lblLoadCost";
             lblLoadCost.Size = new Size(41, 20);
             lblLoadCost.TabIndex = 6;
@@ -479,7 +516,7 @@
             lblCostValue.AutoSize = true;
             lblCostValue.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             lblCostValue.ForeColor = Color.DarkGreen;
-            lblCostValue.Location = new Point(445, 60);
+            lblCostValue.Location = new Point(414, 60);
             lblCostValue.Name = "lblCostValue";
             lblCostValue.Size = new Size(27, 20);
             lblCostValue.TabIndex = 7;
@@ -490,7 +527,7 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.WhiteSmoke;
-            ClientSize = new Size(949, 753);
+            ClientSize = new Size(949, 828);
             Controls.Add(groupBoxLoadInfo);
             Controls.Add(btnClose);
             Controls.Add(lblStatus);
@@ -559,5 +596,9 @@
         private System.Windows.Forms.Label lblWeightValue;
         private System.Windows.Forms.Label lblVolumeValue;
         private System.Windows.Forms.Label lblCostValue;
+
+        private Label lblTransportUnit;
+        private ComboBox cmbTransportUnit;
+        private Label lblCapacityInfo;
     }
 }

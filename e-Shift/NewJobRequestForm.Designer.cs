@@ -38,7 +38,6 @@
             lblDeliveryLocation = new Label();
             groupBoxJobDetails = new GroupBox();
             txtSpecialInstructions = new TextBox();
-            lblSpecialInstructions = new Label();
             comboBoxPriority = new ComboBox();
             lblPriority = new Label();
             dateTimePickerScheduled = new DateTimePicker();
@@ -88,7 +87,7 @@
             groupBoxPickup.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             groupBoxPickup.Location = new Point(30, 80);
             groupBoxPickup.Name = "groupBoxPickup";
-            groupBoxPickup.Size = new Size(320, 180);
+            groupBoxPickup.Size = new Size(528, 180);
             groupBoxPickup.TabIndex = 1;
             groupBoxPickup.TabStop = false;
             groupBoxPickup.Text = "📍 Pickup Location";
@@ -98,7 +97,7 @@
             txtPickupPostal.Font = new Font("Segoe UI", 10F);
             txtPickupPostal.Location = new Point(130, 137);
             txtPickupPostal.Name = "txtPickupPostal";
-            txtPickupPostal.Size = new Size(100, 30);
+            txtPickupPostal.Size = new Size(332, 30);
             txtPickupPostal.TabIndex = 7;
             // 
             // lblPickupPostal
@@ -116,7 +115,7 @@
             txtPickupCity.Font = new Font("Segoe UI", 10F);
             txtPickupCity.Location = new Point(110, 102);
             txtPickupCity.Name = "txtPickupCity";
-            txtPickupCity.Size = new Size(120, 30);
+            txtPickupCity.Size = new Size(352, 30);
             txtPickupCity.TabIndex = 5;
             // 
             // lblPickupCity
@@ -134,7 +133,7 @@
             txtPickupAddress.Font = new Font("Segoe UI", 10F);
             txtPickupAddress.Location = new Point(110, 67);
             txtPickupAddress.Name = "txtPickupAddress";
-            txtPickupAddress.Size = new Size(180, 30);
+            txtPickupAddress.Size = new Size(352, 30);
             txtPickupAddress.TabIndex = 3;
             // 
             // lblPickupAddress
@@ -152,7 +151,7 @@
             txtPickupLocation.Font = new Font("Segoe UI", 10F);
             txtPickupLocation.Location = new Point(110, 32);
             txtPickupLocation.Name = "txtPickupLocation";
-            txtPickupLocation.Size = new Size(180, 30);
+            txtPickupLocation.Size = new Size(352, 30);
             txtPickupLocation.TabIndex = 1;
             // 
             // lblPickupLocation
@@ -176,9 +175,9 @@
             groupBoxDelivery.Controls.Add(txtDeliveryLocation);
             groupBoxDelivery.Controls.Add(lblDeliveryLocation);
             groupBoxDelivery.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            groupBoxDelivery.Location = new Point(370, 80);
+            groupBoxDelivery.Location = new Point(590, 80);
             groupBoxDelivery.Name = "groupBoxDelivery";
-            groupBoxDelivery.Size = new Size(320, 180);
+            groupBoxDelivery.Size = new Size(476, 180);
             groupBoxDelivery.TabIndex = 2;
             groupBoxDelivery.TabStop = false;
             groupBoxDelivery.Text = "🎯 Delivery Location";
@@ -188,7 +187,7 @@
             txtDeliveryPostal.Font = new Font("Segoe UI", 10F);
             txtDeliveryPostal.Location = new Point(130, 137);
             txtDeliveryPostal.Name = "txtDeliveryPostal";
-            txtDeliveryPostal.Size = new Size(100, 30);
+            txtDeliveryPostal.Size = new Size(306, 30);
             txtDeliveryPostal.TabIndex = 7;
             // 
             // lblDeliveryPostal
@@ -206,7 +205,7 @@
             txtDeliveryCity.Font = new Font("Segoe UI", 10F);
             txtDeliveryCity.Location = new Point(110, 102);
             txtDeliveryCity.Name = "txtDeliveryCity";
-            txtDeliveryCity.Size = new Size(120, 30);
+            txtDeliveryCity.Size = new Size(326, 30);
             txtDeliveryCity.TabIndex = 5;
             // 
             // lblDeliveryCity
@@ -224,7 +223,7 @@
             txtDeliveryAddress.Font = new Font("Segoe UI", 10F);
             txtDeliveryAddress.Location = new Point(110, 67);
             txtDeliveryAddress.Name = "txtDeliveryAddress";
-            txtDeliveryAddress.Size = new Size(180, 30);
+            txtDeliveryAddress.Size = new Size(326, 30);
             txtDeliveryAddress.TabIndex = 3;
             // 
             // lblDeliveryAddress
@@ -242,7 +241,7 @@
             txtDeliveryLocation.Font = new Font("Segoe UI", 10F);
             txtDeliveryLocation.Location = new Point(110, 32);
             txtDeliveryLocation.Name = "txtDeliveryLocation";
-            txtDeliveryLocation.Size = new Size(180, 30);
+            txtDeliveryLocation.Size = new Size(326, 30);
             txtDeliveryLocation.TabIndex = 1;
             // 
             // lblDeliveryLocation
@@ -258,7 +257,6 @@
             // groupBoxJobDetails
             // 
             groupBoxJobDetails.Controls.Add(txtSpecialInstructions);
-            groupBoxJobDetails.Controls.Add(lblSpecialInstructions);
             groupBoxJobDetails.Controls.Add(comboBoxPriority);
             groupBoxJobDetails.Controls.Add(lblPriority);
             groupBoxJobDetails.Controls.Add(dateTimePickerScheduled);
@@ -266,7 +264,7 @@
             groupBoxJobDetails.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             groupBoxJobDetails.Location = new Point(30, 280);
             groupBoxJobDetails.Name = "groupBoxJobDetails";
-            groupBoxJobDetails.Size = new Size(660, 150);
+            groupBoxJobDetails.Size = new Size(1036, 86);
             groupBoxJobDetails.TabIndex = 3;
             groupBoxJobDetails.TabStop = false;
             groupBoxJobDetails.Text = "📋 Job Details";
@@ -279,16 +277,6 @@
             txtSpecialInstructions.Name = "txtSpecialInstructions";
             txtSpecialInstructions.Size = new Size(620, 25);
             txtSpecialInstructions.TabIndex = 5;
-            // 
-            // lblSpecialInstructions
-            // 
-            lblSpecialInstructions.AutoSize = true;
-            lblSpecialInstructions.Font = new Font("Segoe UI", 10F);
-            lblSpecialInstructions.Location = new Point(20, 80);
-            lblSpecialInstructions.Name = "lblSpecialInstructions";
-            lblSpecialInstructions.Size = new Size(161, 23);
-            lblSpecialInstructions.TabIndex = 4;
-            lblSpecialInstructions.Text = "Special Instructions:";
             // 
             // comboBoxPriority
             // 
@@ -336,7 +324,7 @@
             // 
             btnSubmitRequest.BackColor = Color.LightGreen;
             btnSubmitRequest.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            btnSubmitRequest.Location = new Point(230, 640);
+            btnSubmitRequest.Location = new Point(262, 835);
             btnSubmitRequest.Name = "btnSubmitRequest";
             btnSubmitRequest.Size = new Size(150, 40);
             btnSubmitRequest.TabIndex = 4;
@@ -348,7 +336,7 @@
             // 
             btnCancel.BackColor = Color.LightCoral;
             btnCancel.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            btnCancel.Location = new Point(390, 640);
+            btnCancel.Location = new Point(535, 835);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(130, 40);
             btnCancel.TabIndex = 5;
@@ -370,9 +358,9 @@
             groupBoxProductSelection.Controls.Add(lblSelectProducts);
             groupBoxProductSelection.Controls.Add(dgvProductSelection);
             groupBoxProductSelection.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            groupBoxProductSelection.Location = new Point(30, 350);
+            groupBoxProductSelection.Location = new Point(30, 390);
             groupBoxProductSelection.Name = "groupBoxProductSelection";
-            groupBoxProductSelection.Size = new Size(660, 200);
+            groupBoxProductSelection.Size = new Size(1036, 344);
             groupBoxProductSelection.TabIndex = 7;
             groupBoxProductSelection.TabStop = false;
             groupBoxProductSelection.Text = "📦 Select Items to Move";
@@ -399,7 +387,7 @@
             dgvProductSelection.RowHeadersVisible = false;
             dgvProductSelection.RowHeadersWidth = 51;
             dgvProductSelection.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvProductSelection.Size = new Size(620, 140);
+            dgvProductSelection.Size = new Size(995, 282);
             dgvProductSelection.TabIndex = 1;
             dgvProductSelection.CellValueChanged += dgvProductSelection_CellValueChanged;
             // 
@@ -412,7 +400,7 @@
             groupBoxCalculatedTotals.Controls.Add(lblEstimatedCost);
             groupBoxCalculatedTotals.Controls.Add(lblCostValue);
             groupBoxCalculatedTotals.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            groupBoxCalculatedTotals.Location = new Point(30, 560);
+            groupBoxCalculatedTotals.Location = new Point(30, 740);
             groupBoxCalculatedTotals.Name = "groupBoxCalculatedTotals";
             groupBoxCalculatedTotals.Size = new Size(660, 60);
             groupBoxCalculatedTotals.TabIndex = 8;
@@ -481,13 +469,14 @@
             lblCostValue.Size = new Size(65, 28);
             lblCostValue.TabIndex = 5;
             lblCostValue.Text = "$0.00";
+            lblCostValue.Click += lblCostValue_Click;
             // 
             // NewJobRequestForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.WhiteSmoke;
-            ClientSize = new Size(720, 700);
+            ClientSize = new Size(1078, 934);
             Controls.Add(groupBoxProductSelection);
             Controls.Add(groupBoxCalculatedTotals);
             Controls.Add(lblStatus);
@@ -544,7 +533,6 @@
         private System.Windows.Forms.DateTimePicker dateTimePickerScheduled;
         private System.Windows.Forms.Label lblPriority;
         private System.Windows.Forms.ComboBox comboBoxPriority;
-        private System.Windows.Forms.Label lblSpecialInstructions;
         private System.Windows.Forms.TextBox txtSpecialInstructions;
         private System.Windows.Forms.Button btnSubmitRequest;
         private System.Windows.Forms.Button btnCancel;

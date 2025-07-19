@@ -45,7 +45,7 @@ namespace e_Shift
             try
             {
                 string query = @"
-            SELECT ProductID, ProductName, Category, DefaultWeight, DefaultVolume, PricePerUnit,
+            SELECT ProductID, ProductName, Category, Weight, Volume, PricePerUnit,
                    HandlingRequirements, IsFragile
             FROM Products 
             WHERE IsActive = 1 AND IsDeleted = 0
@@ -74,8 +74,8 @@ namespace e_Shift
                         newRow["ProductID"] = row["ProductID"];
                         newRow["Product Name"] = row["ProductName"];
                         newRow["Category"] = row["Category"];
-                        newRow["Weight (kg)"] = row["DefaultWeight"];
-                        newRow["Volume (m³)"] = row["DefaultVolume"];
+                        newRow["Weight (kg)"] = row["Weight"];
+                        newRow["Volume (m³)"] = row["Volume"];
                         newRow["Price/Unit"] = row["PricePerUnit"];
                         newRow["Quantity"] = 0;
                         newRow["Fragile"] = Convert.ToBoolean(row["IsFragile"]) ? "Yes" : "No";
@@ -414,7 +414,8 @@ namespace e_Shift
                 {
                     System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
                     timer.Interval = 5000;
-                    timer.Tick += (s, e) => {
+                    timer.Tick += (s, e) =>
+                    {
                         lblStatus.Text = "";
                         timer.Stop();
                         timer.Dispose();
@@ -433,6 +434,11 @@ namespace e_Shift
         private void txtDeliveryPostal_TextChanged(object sender, EventArgs e)
         {
             // Could add postal code lookup functionality here
+        }
+
+        private void lblCostValue_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

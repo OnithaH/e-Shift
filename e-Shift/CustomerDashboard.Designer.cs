@@ -33,7 +33,6 @@
             groupBoxActions = new GroupBox();
             btnLogout = new Button();
             btnEditProfile = new Button();
-            btnViewMyJobs = new Button();
             btnNewJobRequest = new Button();
             groupBoxRecentJobs = new GroupBox();
             dataGridViewJobs = new DataGridView();
@@ -98,7 +97,7 @@
             groupBoxStats.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             groupBoxStats.Location = new Point(30, 170);
             groupBoxStats.Name = "groupBoxStats";
-            groupBoxStats.Size = new Size(350, 200);
+            groupBoxStats.Size = new Size(393, 200);
             groupBoxStats.TabIndex = 4;
             groupBoxStats.TabStop = false;
             groupBoxStats.Text = "My Job Statistics";
@@ -191,12 +190,11 @@
             // 
             groupBoxActions.Controls.Add(btnLogout);
             groupBoxActions.Controls.Add(btnEditProfile);
-            groupBoxActions.Controls.Add(btnViewMyJobs);
             groupBoxActions.Controls.Add(btnNewJobRequest);
             groupBoxActions.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            groupBoxActions.Location = new Point(400, 170);
+            groupBoxActions.Location = new Point(429, 170);
             groupBoxActions.Name = "groupBoxActions";
-            groupBoxActions.Size = new Size(250, 214);
+            groupBoxActions.Size = new Size(353, 200);
             groupBoxActions.TabIndex = 5;
             groupBoxActions.TabStop = false;
             groupBoxActions.Text = "Quick Actions";
@@ -205,9 +203,9 @@
             // 
             btnLogout.BackColor = Color.LightPink;
             btnLogout.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnLogout.Location = new Point(64, 166);
+            btnLogout.Location = new Point(20, 121);
             btnLogout.Name = "btnLogout";
-            btnLogout.Size = new Size(120, 38);
+            btnLogout.Size = new Size(327, 38);
             btnLogout.TabIndex = 3;
             btnLogout.Text = "Logout";
             btnLogout.UseVisualStyleBackColor = false;
@@ -217,25 +215,13 @@
             // 
             btnEditProfile.BackColor = Color.LightYellow;
             btnEditProfile.Font = new Font("Segoe UI", 10F);
-            btnEditProfile.Location = new Point(20, 125);
+            btnEditProfile.Location = new Point(20, 80);
             btnEditProfile.Name = "btnEditProfile";
-            btnEditProfile.Size = new Size(200, 35);
+            btnEditProfile.Size = new Size(327, 35);
             btnEditProfile.TabIndex = 2;
             btnEditProfile.Text = "👤 Edit Profile";
             btnEditProfile.UseVisualStyleBackColor = false;
             btnEditProfile.Click += btnEditProfile_Click;
-            // 
-            // btnViewMyJobs
-            // 
-            btnViewMyJobs.BackColor = Color.LightBlue;
-            btnViewMyJobs.Font = new Font("Segoe UI", 10F);
-            btnViewMyJobs.Location = new Point(20, 80);
-            btnViewMyJobs.Name = "btnViewMyJobs";
-            btnViewMyJobs.Size = new Size(200, 35);
-            btnViewMyJobs.TabIndex = 1;
-            btnViewMyJobs.Text = "📋 View My Jobs";
-            btnViewMyJobs.UseVisualStyleBackColor = false;
-            btnViewMyJobs.Click += btnViewMyJobs_Click;
             // 
             // btnNewJobRequest
             // 
@@ -243,7 +229,7 @@
             btnNewJobRequest.Font = new Font("Segoe UI", 10F);
             btnNewJobRequest.Location = new Point(20, 35);
             btnNewJobRequest.Name = "btnNewJobRequest";
-            btnNewJobRequest.Size = new Size(200, 35);
+            btnNewJobRequest.Size = new Size(327, 35);
             btnNewJobRequest.TabIndex = 0;
             btnNewJobRequest.Text = "📦 New Job Request";
             btnNewJobRequest.UseVisualStyleBackColor = false;
@@ -255,7 +241,7 @@
             groupBoxRecentJobs.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             groupBoxRecentJobs.Location = new Point(30, 390);
             groupBoxRecentJobs.Name = "groupBoxRecentJobs";
-            groupBoxRecentJobs.Size = new Size(620, 200);
+            groupBoxRecentJobs.Size = new Size(746, 425);
             groupBoxRecentJobs.TabIndex = 6;
             groupBoxRecentJobs.TabStop = false;
             groupBoxRecentJobs.Text = "Recent Job Requests";
@@ -271,14 +257,14 @@
             dataGridViewJobs.ReadOnly = true;
             dataGridViewJobs.RowHeadersWidth = 51;
             dataGridViewJobs.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridViewJobs.Size = new Size(580, 150);
+            dataGridViewJobs.Size = new Size(705, 380);
             dataGridViewJobs.TabIndex = 0;
             // 
             // lblStatus
             // 
             lblStatus.AutoSize = true;
             lblStatus.Font = new Font("Segoe UI", 10F);
-            lblStatus.Location = new Point(30, 610);
+            lblStatus.Location = new Point(30, 849);
             lblStatus.Name = "lblStatus";
             lblStatus.Size = new Size(56, 23);
             lblStatus.TabIndex = 7;
@@ -289,7 +275,7 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.WhiteSmoke;
-            ClientSize = new Size(700, 650);
+            ClientSize = new Size(794, 890);
             Controls.Add(lblStatus);
             Controls.Add(groupBoxRecentJobs);
             Controls.Add(groupBoxActions);
@@ -331,7 +317,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.GroupBox groupBoxActions;
         private System.Windows.Forms.Button btnNewJobRequest;
-        private System.Windows.Forms.Button btnViewMyJobs;
         private System.Windows.Forms.Button btnEditProfile;
         private System.Windows.Forms.Button btnLogout;
         private System.Windows.Forms.GroupBox groupBoxRecentJobs;

@@ -33,6 +33,7 @@ namespace e_Shift
 
             // Load jobs
             LoadJobs();
+            LoadAvailableTransportUnits();
 
             // Clear job details
             ClearJobDetails();
@@ -283,6 +284,33 @@ namespace e_Shift
             }
         }
 
+        private void cmbTransportUnit_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbTransportUnit.SelectedIndex >= 0 && cmbTransportUnit.SelectedValue != null)
+            {
+                try
+                {
+                    DataTable dt = (DataTable)cmbTransportUnit.DataSource;
+                    DataRow selectedRow = dt.Select($"TransportUnitID = {cmbTransportUnit.SelectedValue}")[0];
+
+                    decimal loadCapacity = Convert.ToDecimal(selectedRow["LoadCapacity"]);
+                    decimal volumeCapacity = Convert.ToDecimal(selectedRow["VolumeCapacity"]);
+
+                    lblCapacityInfo.Text = $"Capacity: {loadCapacity} kg, {volumeCapacity} m³";
+                    lblCapacityInfo.ForeColor = Color.Blue;
+                }
+                catch (Exception)
+                {
+                    lblCapacityInfo.Text = "Capacity info unavailable";
+                    lblCapacityInfo.ForeColor = Color.Red;
+                }
+            }
+            else
+            {
+                lblCapacityInfo.Text = "";
+            }
+        }
+
         // 2. Add a new method to handle cell clicks (more reliable than selection changed):
         private void dataGridViewJobs_CellClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -293,6 +321,101 @@ namespace e_Shift
                 LoadJobDetails(selectedRow);
             }
         }
+
+        private bool ApproveJobWithTransportUnit(int jobId, decimal estimatedCost, int transportUnitId)
+        {
+            try
+            {
+                // Step 1: Update job with approval and transport unit assignment
+                string updateJobQuery = @"
+            UPDATE Jobs 
+            SET Status = 'Approved', 
+                EstimatedCost = @EstimatedCost,
+                TransportUnitID = @TransportUnitID,
+                ApprovedByAdminID = @AdminID,
+                ApprovalDate = @ApprovalDate,
+                ModifiedDate = @ModifiedDate
+            WHERE JobID = @JobID";
+
+                SqlParameter[] jobParameters = {
+            new SqlParameter("@EstimatedCost", estimatedCost),
+            new SqlParameter("@TransportUnitID", transportUnitId),
+            new SqlParameter("@AdminID", UserSession.UserId),
+            new SqlParameter("@ApprovalDate", DateTime.Now),
+            new SqlParameter("@ModifiedDate", DateTime.Now),
+            new SqlParameter("@JobID", jobId)
+        };
+
+                int jobUpdateResult = DatabaseConnection.ExecuteNonQuery(updateJobQuery, jobParameters);
+
+                if (jobUpdateResult > 0)
+                {
+                    // Step 2: Mark transport unit as unavailable
+                    string updateTransportQuery = @"
+                UPDATE TransportUnits 
+                SET IsAvailable = 0, 
+                    AssignedDate = @AssignedDate,
+                    Status = 'Assigned',
+                    ModifiedDate = @ModifiedDate
+                WHERE TransportUnitID = @TransportUnitID";
+
+                    SqlParameter[] transportParameters = {
+                new SqlParameter("@AssignedDate", DateTime.Now),
+                new SqlParameter("@ModifiedDate", DateTime.Now),
+                new SqlParameter("@TransportUnitID", transportUnitId)
+            };
+
+                    DatabaseConnection.ExecuteNonQuery(updateTransportQuery, transportParameters);
+
+                    // Step 3: Create Load record for this job
+                    CreateLoadForApprovedJob(jobId, transportUnitId, estimatedCost);
+
+                    return true;
+                }
+                else
+                {
+                    ShowMessage("Failed to approve job. Please try again.", true);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error approving job: {ex.Message}", true);
+                return false;
+            }
+        }
+        private void CreateLoadForApprovedJob(int jobId, int transportUnitId, decimal estimatedCost)
+        {
+            try
+            {
+                // Create a load record for the approved job
+                string createLoadQuery = @"
+            INSERT INTO Loads (LoadNumber, JobID, Description, Weight, Volume, 
+                              Status, TransportUnitID, LoadCost, CreatedDate, ModifiedDate, IsDeleted)
+            VALUES (@LoadNumber, @JobID, @Description, 0, 0, 
+                   'Assigned', @TransportUnitID, @LoadCost, @CreatedDate, @ModifiedDate, 0)";
+
+                string loadNumber = $"LOAD{jobId:000}"; // Generate load number like LOAD001
+
+                SqlParameter[] loadParameters = {
+            new SqlParameter("@LoadNumber", loadNumber),
+            new SqlParameter("@JobID", jobId),
+            new SqlParameter("@Description", $"Transport load for Job {jobId}"),
+            new SqlParameter("@TransportUnitID", transportUnitId),
+            new SqlParameter("@LoadCost", estimatedCost),
+            new SqlParameter("@CreatedDate", DateTime.Now),
+            new SqlParameter("@ModifiedDate", DateTime.Now)
+        };
+
+                DatabaseConnection.ExecuteNonQuery(createLoadQuery, loadParameters);
+            }
+            catch (Exception ex)
+            {
+                // Log the error but don't stop the approval process
+                ShowMessage($"Load creation warning: {ex.Message}", true);
+            }
+        }
+
 
         private void ClearJobDetails()
         {
@@ -327,6 +450,14 @@ namespace e_Shift
                 return;
             }
 
+            // NEW: Validate transport unit is selected
+            if (cmbTransportUnit.SelectedIndex < 0 || cmbTransportUnit.SelectedValue == null)
+            {
+                ShowMessage("Please select a transport unit before approving the job", true);
+                cmbTransportUnit.Focus();
+                return;
+            }
+
             decimal estimatedCost;
             if (!decimal.TryParse(txtEstimatedCost.Text, out estimatedCost) || estimatedCost <= 0)
             {
@@ -335,18 +466,24 @@ namespace e_Shift
                 return;
             }
 
+            // Get selected transport unit ID
+            int transportUnitId = Convert.ToInt32(cmbTransportUnit.SelectedValue);
+
             DialogResult result = MessageBox.Show(
-                $"Are you sure you want to approve this job?\n\nEstimated Cost: ${estimatedCost:F2}",
+                $"Are you sure you want to approve this job?\n\n" +
+                $"Estimated Cost: ${estimatedCost:F2}\n" +
+                $"Assigned Transport Unit: {cmbTransportUnit.Text}",
                 "Confirm Approval",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
-                if (ApproveJob(selectedJobId, estimatedCost))
+                if (ApproveJobWithTransportUnit(selectedJobId, estimatedCost, transportUnitId))
                 {
-                    ShowMessage("Job approved successfully!", false);
+                    ShowMessage("Job approved successfully and transport unit assigned!", false);
                     RefreshJobs();
+                    LoadAvailableTransportUnits(); // Refresh dropdown
                 }
             }
         }
@@ -565,6 +702,73 @@ namespace e_Shift
             }
         }
 
+        private void LoadAvailableTransportUnits()
+        {
+            try
+            {
+                string query = @"
+            SELECT 
+                tu.TransportUnitID,
+                tu.UnitNumber,
+                l.RegistrationNumber,
+                l.LoadCapacity,
+                l.VolumeCapacity,
+                CONCAT(d.FirstName, ' ', d.LastName) as DriverName
+            FROM TransportUnits tu
+            INNER JOIN Lorries l ON tu.LorryID = l.LorryID
+            INNER JOIN Drivers d ON tu.DriverID = d.DriverID
+            WHERE tu.IsAvailable = 1 AND tu.IsDeleted = 0
+            ORDER BY tu.UnitNumber";
+
+                DataTable transportUnits = DatabaseConnection.FillDataTable(query);
+
+                if (transportUnits != null && transportUnits.Rows.Count > 0)
+                {
+                    // Create display table with formatted text
+                    DataTable displayTable = new DataTable();
+                    displayTable.Columns.Add("TransportUnitID", typeof(int));
+                    displayTable.Columns.Add("DisplayText", typeof(string));
+                    displayTable.Columns.Add("LoadCapacity", typeof(decimal));
+                    displayTable.Columns.Add("VolumeCapacity", typeof(decimal));
+
+                    foreach (DataRow row in transportUnits.Rows)
+                    {
+                        DataRow newRow = displayTable.NewRow();
+                        newRow["TransportUnitID"] = row["TransportUnitID"];
+                        newRow["DisplayText"] = $"{row["UnitNumber"]} - {row["RegistrationNumber"]} (Driver: {row["DriverName"]})";
+                        newRow["LoadCapacity"] = row["LoadCapacity"];
+                        newRow["VolumeCapacity"] = row["VolumeCapacity"];
+                        displayTable.Rows.Add(newRow);
+                    }
+
+                    cmbTransportUnit.DataSource = displayTable;
+                    cmbTransportUnit.DisplayMember = "DisplayText";
+                    cmbTransportUnit.ValueMember = "TransportUnitID";
+                    cmbTransportUnit.SelectedIndex = -1; // No selection initially
+                }
+                else
+                {
+                    // No available units
+                    DataTable emptyTable = new DataTable();
+                    emptyTable.Columns.Add("TransportUnitID", typeof(int));
+                    emptyTable.Columns.Add("DisplayText", typeof(string));
+                    DataRow emptyRow = emptyTable.NewRow();
+                    emptyRow["TransportUnitID"] = -1;
+                    emptyRow["DisplayText"] = "No available transport units";
+                    emptyTable.Rows.Add(emptyRow);
+
+                    cmbTransportUnit.DataSource = emptyTable;
+                    cmbTransportUnit.DisplayMember = "DisplayText";
+                    cmbTransportUnit.ValueMember = "TransportUnitID";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading transport units: {ex.Message}", "Error",
+                               MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void comboBoxFilterStatus_SelectedIndexChanged(object sender, EventArgs e)
         {
             string selectedStatus = comboBoxFilterStatus.Text;
@@ -585,10 +789,17 @@ namespace e_Shift
 
         private void RefreshJobs()
         {
-            string selectedStatus = comboBoxFilterStatus.Text;
-            LoadJobs(selectedStatus);
+            // Get current filter status
+            string currentFilter = comboBoxFilterStatus.SelectedItem?.ToString() ?? "Pending";
+
+            // Reload jobs with current filter
+            LoadJobs(currentFilter);
+
+            // Clear job details since selection might change
             ClearJobDetails();
-            ShowMessage("Jobs refreshed", false);
+
+            // Reset selected job
+            selectedJobId = -1;
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -623,6 +834,16 @@ namespace e_Shift
         }
 
         private void comboBoxNewStatus_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lblTransportUnit_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void groupBoxActions_Enter(object sender, EventArgs e)
         {
 
         }
