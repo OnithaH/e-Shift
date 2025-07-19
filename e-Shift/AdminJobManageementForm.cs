@@ -177,12 +177,13 @@ namespace e_Shift
                 lblFromTo.Text = $"From/To: {row.Cells["StartLocation"].Value}, {row.Cells["StartCity"].Value} → {row.Cells["Destination"].Value}, {row.Cells["DestinationCity"].Value}";
                 lblRequestDate.Text = $"Request Date: {Convert.ToDateTime(row.Cells["RequestDate"].Value):MM/dd/yyyy}";
                 lblCurrentStatus.Text = $"Status: {row.Cells["Status"].Value} (Priority: {row.Cells["Priority"].Value})";
-
                 string specialInstr = row.Cells["SpecialInstructions"].Value?.ToString();
                 txtJobDetails.Text = string.IsNullOrEmpty(specialInstr) ? "No special instructions" : specialInstr;
-
                 decimal estimatedCost = Convert.ToDecimal(row.Cells["EstimatedCost"].Value ?? 0);
                 txtEstimatedCost.Text = estimatedCost.ToString("F2");
+
+                // NEW: Load associated load details
+                LoadJobLoadDetails(selectedJobId);
 
                 // Enable/disable buttons based on status
                 string status = row.Cells["Status"].Value?.ToString();
@@ -192,7 +193,6 @@ namespace e_Shift
 
                 // Clear and populate status dropdown based on current status
                 comboBoxNewStatus.Items.Clear();
-
                 if (status == "Pending")
                 {
                     // For pending jobs, no status update needed (use approve/decline instead)
@@ -212,13 +212,74 @@ namespace e_Shift
                     // For completed or declined jobs
                     comboBoxNewStatus.Items.Add("No Updates Available");
                 }
-
                 if (comboBoxNewStatus.Items.Count > 0)
                     comboBoxNewStatus.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
                 ShowMessage($"Error loading job details: {ex.Message}", true);
+            }
+        }
+
+
+        private void LoadJobLoadDetails(int jobId)
+        {
+            try
+            {
+                string query = @"
+            SELECT 
+                l.Description,
+                l.Weight,
+                l.Volume,
+                l.LoadCost,
+                COUNT(lp.LoadProductID) as ProductCount
+            FROM Loads l
+            LEFT JOIN LoadProducts lp ON l.LoadID = lp.LoadID
+            WHERE l.JobID = @JobID AND l.IsDeleted = 0
+            GROUP BY l.LoadID, l.Description, l.Weight, l.Volume, l.LoadCost";
+
+                SqlParameter[] parameters = {
+            new SqlParameter("@JobID", jobId)
+        };
+
+                using (SqlDataReader reader = DatabaseConnection.ExecuteReader(query, parameters))
+                {
+                    if (reader != null && reader.Read())
+                    {
+                        // Display load information
+                        string description = reader["Description"].ToString();
+                        decimal weight = Convert.ToDecimal(reader["Weight"]);
+                        decimal volume = Convert.ToDecimal(reader["Volume"]);
+                        decimal loadCost = Convert.ToDecimal(reader["LoadCost"]);
+                        int productCount = Convert.ToInt32(reader["ProductCount"]);
+
+                        txtLoadDetails.Text = description;
+                        lblWeightValue.Text = $"{weight} kg";
+                        lblVolumeValue.Text = $"{volume} m³";
+                        lblCostValue.Text = $"${loadCost:F2}";
+
+                        if (productCount > 0)
+                        {
+                            txtLoadDetails.Text += $" ({productCount} different products)";
+                        }
+                    }
+                    else
+                    {
+                        // No load details found
+                        txtLoadDetails.Text = "No load details specified";
+                        lblWeightValue.Text = "Not specified";
+                        lblVolumeValue.Text = "Not specified";
+                        lblCostValue.Text = "$0.00";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                txtLoadDetails.Text = "Error loading load details";
+                lblWeightValue.Text = "Error";
+                lblVolumeValue.Text = "Error";
+                lblCostValue.Text = "Error";
+                ShowMessage($"Error loading load details: {ex.Message}", true);
             }
         }
 
@@ -243,6 +304,15 @@ namespace e_Shift
             txtJobDetails.Text = "";
             txtEstimatedCost.Text = "0.00";
             txtDeclineReason.Text = "";
+
+            btnApprove.Enabled = false;
+            btnDecline.Enabled = false;
+            btnUpdateStatus.Enabled = false;
+
+            txtLoadDetails.Text = "";
+            lblWeightValue.Text = "0 kg";
+            lblVolumeValue.Text = "0 m³";
+            lblCostValue.Text = "$0.00";
 
             btnApprove.Enabled = false;
             btnDecline.Enabled = false;

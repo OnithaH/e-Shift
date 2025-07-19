@@ -17,372 +17,505 @@
 
         private void InitializeComponent()
         {
-            this.lblTitle = new System.Windows.Forms.Label();
-            this.groupBoxPickup = new System.Windows.Forms.GroupBox();
-            this.lblPickupLocation = new System.Windows.Forms.Label();
-            this.txtPickupLocation = new System.Windows.Forms.TextBox();
-            this.lblPickupAddress = new System.Windows.Forms.Label();
-            this.txtPickupAddress = new System.Windows.Forms.TextBox();
-            this.lblPickupCity = new System.Windows.Forms.Label();
-            this.txtPickupCity = new System.Windows.Forms.TextBox();
-            this.lblPickupPostal = new System.Windows.Forms.Label();
-            this.txtPickupPostal = new System.Windows.Forms.TextBox();
-            this.groupBoxDelivery = new System.Windows.Forms.GroupBox();
-            this.lblDeliveryLocation = new System.Windows.Forms.Label();
-            this.txtDeliveryLocation = new System.Windows.Forms.TextBox();
-            this.lblDeliveryAddress = new System.Windows.Forms.Label();
-            this.txtDeliveryAddress = new System.Windows.Forms.TextBox();
-            this.lblDeliveryCity = new System.Windows.Forms.Label();
-            this.txtDeliveryCity = new System.Windows.Forms.TextBox();
-            this.lblDeliveryPostal = new System.Windows.Forms.Label();
-            this.txtDeliveryPostal = new System.Windows.Forms.TextBox();
-            this.groupBoxJobDetails = new System.Windows.Forms.GroupBox();
-            this.lblScheduledDate = new System.Windows.Forms.Label();
-            this.dateTimePickerScheduled = new System.Windows.Forms.DateTimePicker();
-            this.lblPriority = new System.Windows.Forms.Label();
-            this.comboBoxPriority = new System.Windows.Forms.ComboBox();
-            this.lblSpecialInstructions = new System.Windows.Forms.Label();
-            this.txtSpecialInstructions = new System.Windows.Forms.TextBox();
-            this.btnSubmitRequest = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.lblStatus = new System.Windows.Forms.Label();
-            this.groupBoxPickup.SuspendLayout();
-            this.groupBoxDelivery.SuspendLayout();
-            this.groupBoxJobDetails.SuspendLayout();
-            this.SuspendLayout();
+            lblTitle = new Label();
+            groupBoxPickup = new GroupBox();
+            txtPickupPostal = new TextBox();
+            lblPickupPostal = new Label();
+            txtPickupCity = new TextBox();
+            lblPickupCity = new Label();
+            txtPickupAddress = new TextBox();
+            lblPickupAddress = new Label();
+            txtPickupLocation = new TextBox();
+            lblPickupLocation = new Label();
+            groupBoxDelivery = new GroupBox();
+            txtDeliveryPostal = new TextBox();
+            lblDeliveryPostal = new Label();
+            txtDeliveryCity = new TextBox();
+            lblDeliveryCity = new Label();
+            txtDeliveryAddress = new TextBox();
+            lblDeliveryAddress = new Label();
+            txtDeliveryLocation = new TextBox();
+            lblDeliveryLocation = new Label();
+            groupBoxJobDetails = new GroupBox();
+            txtSpecialInstructions = new TextBox();
+            lblSpecialInstructions = new Label();
+            comboBoxPriority = new ComboBox();
+            lblPriority = new Label();
+            dateTimePickerScheduled = new DateTimePicker();
+            lblScheduledDate = new Label();
+            btnSubmitRequest = new Button();
+            btnCancel = new Button();
+            lblStatus = new Label();
+            groupBoxProductSelection = new GroupBox();
+            lblSelectProducts = new Label();
+            dgvProductSelection = new DataGridView();
+            groupBoxCalculatedTotals = new GroupBox();
+            lblTotalWeight = new Label();
+            lblWeightValue = new Label();
+            lblTotalVolume = new Label();
+            lblVolumeValue = new Label();
+            lblEstimatedCost = new Label();
+            lblCostValue = new Label();
+            groupBoxPickup.SuspendLayout();
+            groupBoxDelivery.SuspendLayout();
+            groupBoxJobDetails.SuspendLayout();
+            groupBoxProductSelection.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvProductSelection).BeginInit();
+            groupBoxCalculatedTotals.SuspendLayout();
+            SuspendLayout();
             // 
             // lblTitle
             // 
-            this.lblTitle.AutoSize = true;
-            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
-            this.lblTitle.ForeColor = System.Drawing.Color.DarkBlue;
-            this.lblTitle.Location = new System.Drawing.Point(200, 20);
-            this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(284, 37);
-            this.lblTitle.TabIndex = 0;
-            this.lblTitle.Text = "New Transport Request";
+            lblTitle.AutoSize = true;
+            lblTitle.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
+            lblTitle.ForeColor = Color.DarkBlue;
+            lblTitle.Location = new Point(200, 20);
+            lblTitle.Name = "lblTitle";
+            lblTitle.Size = new Size(317, 37);
+            lblTitle.TabIndex = 0;
+            lblTitle.Text = "New Transport Request";
             // 
             // groupBoxPickup
             // 
-            this.groupBoxPickup.Controls.Add(this.txtPickupPostal);
-            this.groupBoxPickup.Controls.Add(this.lblPickupPostal);
-            this.groupBoxPickup.Controls.Add(this.txtPickupCity);
-            this.groupBoxPickup.Controls.Add(this.lblPickupCity);
-            this.groupBoxPickup.Controls.Add(this.txtPickupAddress);
-            this.groupBoxPickup.Controls.Add(this.lblPickupAddress);
-            this.groupBoxPickup.Controls.Add(this.txtPickupLocation);
-            this.groupBoxPickup.Controls.Add(this.lblPickupLocation);
-            this.groupBoxPickup.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
-            this.groupBoxPickup.Location = new System.Drawing.Point(30, 80);
-            this.groupBoxPickup.Name = "groupBoxPickup";
-            this.groupBoxPickup.Size = new System.Drawing.Size(320, 180);
-            this.groupBoxPickup.TabIndex = 1;
-            this.groupBoxPickup.TabStop = false;
-            this.groupBoxPickup.Text = "📍 Pickup Location";
-            // 
-            // lblPickupLocation
-            // 
-            this.lblPickupLocation.AutoSize = true;
-            this.lblPickupLocation.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblPickupLocation.Location = new System.Drawing.Point(20, 35);
-            this.lblPickupLocation.Name = "lblPickupLocation";
-            this.lblPickupLocation.Size = new System.Drawing.Size(82, 23);
-            this.lblPickupLocation.TabIndex = 0;
-            this.lblPickupLocation.Text = "Location *:";
-            // 
-            // txtPickupLocation
-            // 
-            this.txtPickupLocation.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtPickupLocation.Location = new System.Drawing.Point(110, 32);
-            this.txtPickupLocation.Name = "txtPickupLocation";
-            this.txtPickupLocation.Size = new System.Drawing.Size(180, 30);
-            this.txtPickupLocation.TabIndex = 1;
-            // 
-            // lblPickupAddress
-            // 
-            this.lblPickupAddress.AutoSize = true;
-            this.lblPickupAddress.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblPickupAddress.Location = new System.Drawing.Point(20, 70);
-            this.lblPickupAddress.Name = "lblPickupAddress";
-            this.lblPickupAddress.Size = new System.Drawing.Size(79, 23);
-            this.lblPickupAddress.TabIndex = 2;
-            this.lblPickupAddress.Text = "Address *:";
-            // 
-            // txtPickupAddress
-            // 
-            this.txtPickupAddress.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtPickupAddress.Location = new System.Drawing.Point(110, 67);
-            this.txtPickupAddress.Name = "txtPickupAddress";
-            this.txtPickupAddress.Size = new System.Drawing.Size(180, 30);
-            this.txtPickupAddress.TabIndex = 3;
-            // 
-            // lblPickupCity
-            // 
-            this.lblPickupCity.AutoSize = true;
-            this.lblPickupCity.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblPickupCity.Location = new System.Drawing.Point(20, 105);
-            this.lblPickupCity.Name = "lblPickupCity";
-            this.lblPickupCity.Size = new System.Drawing.Size(50, 23);
-            this.lblPickupCity.TabIndex = 4;
-            this.lblPickupCity.Text = "City *:";
-            // 
-            // txtPickupCity
-            // 
-            this.txtPickupCity.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtPickupCity.Location = new System.Drawing.Point(110, 102);
-            this.txtPickupCity.Name = "txtPickupCity";
-            this.txtPickupCity.Size = new System.Drawing.Size(120, 30);
-            this.txtPickupCity.TabIndex = 5;
-            // 
-            // lblPickupPostal
-            // 
-            this.lblPickupPostal.AutoSize = true;
-            this.lblPickupPostal.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblPickupPostal.Location = new System.Drawing.Point(20, 140);
-            this.lblPickupPostal.Name = "lblPickupPostal";
-            this.lblPickupPostal.Size = new System.Drawing.Size(97, 23);
-            this.lblPickupPostal.TabIndex = 6;
-            this.lblPickupPostal.Text = "Postal Code:";
+            groupBoxPickup.Controls.Add(txtPickupPostal);
+            groupBoxPickup.Controls.Add(lblPickupPostal);
+            groupBoxPickup.Controls.Add(txtPickupCity);
+            groupBoxPickup.Controls.Add(lblPickupCity);
+            groupBoxPickup.Controls.Add(txtPickupAddress);
+            groupBoxPickup.Controls.Add(lblPickupAddress);
+            groupBoxPickup.Controls.Add(txtPickupLocation);
+            groupBoxPickup.Controls.Add(lblPickupLocation);
+            groupBoxPickup.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            groupBoxPickup.Location = new Point(30, 80);
+            groupBoxPickup.Name = "groupBoxPickup";
+            groupBoxPickup.Size = new Size(320, 180);
+            groupBoxPickup.TabIndex = 1;
+            groupBoxPickup.TabStop = false;
+            groupBoxPickup.Text = "📍 Pickup Location";
             // 
             // txtPickupPostal
             // 
-            this.txtPickupPostal.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtPickupPostal.Location = new System.Drawing.Point(130, 137);
-            this.txtPickupPostal.Name = "txtPickupPostal";
-            this.txtPickupPostal.Size = new System.Drawing.Size(100, 30);
-            this.txtPickupPostal.TabIndex = 7;
+            txtPickupPostal.Font = new Font("Segoe UI", 10F);
+            txtPickupPostal.Location = new Point(130, 137);
+            txtPickupPostal.Name = "txtPickupPostal";
+            txtPickupPostal.Size = new Size(100, 30);
+            txtPickupPostal.TabIndex = 7;
+            // 
+            // lblPickupPostal
+            // 
+            lblPickupPostal.AutoSize = true;
+            lblPickupPostal.Font = new Font("Segoe UI", 10F);
+            lblPickupPostal.Location = new Point(20, 140);
+            lblPickupPostal.Name = "lblPickupPostal";
+            lblPickupPostal.Size = new Size(104, 23);
+            lblPickupPostal.TabIndex = 6;
+            lblPickupPostal.Text = "Postal Code:";
+            // 
+            // txtPickupCity
+            // 
+            txtPickupCity.Font = new Font("Segoe UI", 10F);
+            txtPickupCity.Location = new Point(110, 102);
+            txtPickupCity.Name = "txtPickupCity";
+            txtPickupCity.Size = new Size(120, 30);
+            txtPickupCity.TabIndex = 5;
+            // 
+            // lblPickupCity
+            // 
+            lblPickupCity.AutoSize = true;
+            lblPickupCity.Font = new Font("Segoe UI", 10F);
+            lblPickupCity.Location = new Point(20, 105);
+            lblPickupCity.Name = "lblPickupCity";
+            lblPickupCity.Size = new Size(55, 23);
+            lblPickupCity.TabIndex = 4;
+            lblPickupCity.Text = "City *:";
+            // 
+            // txtPickupAddress
+            // 
+            txtPickupAddress.Font = new Font("Segoe UI", 10F);
+            txtPickupAddress.Location = new Point(110, 67);
+            txtPickupAddress.Name = "txtPickupAddress";
+            txtPickupAddress.Size = new Size(180, 30);
+            txtPickupAddress.TabIndex = 3;
+            // 
+            // lblPickupAddress
+            // 
+            lblPickupAddress.AutoSize = true;
+            lblPickupAddress.Font = new Font("Segoe UI", 10F);
+            lblPickupAddress.Location = new Point(20, 70);
+            lblPickupAddress.Name = "lblPickupAddress";
+            lblPickupAddress.Size = new Size(86, 23);
+            lblPickupAddress.TabIndex = 2;
+            lblPickupAddress.Text = "Address *:";
+            // 
+            // txtPickupLocation
+            // 
+            txtPickupLocation.Font = new Font("Segoe UI", 10F);
+            txtPickupLocation.Location = new Point(110, 32);
+            txtPickupLocation.Name = "txtPickupLocation";
+            txtPickupLocation.Size = new Size(180, 30);
+            txtPickupLocation.TabIndex = 1;
+            // 
+            // lblPickupLocation
+            // 
+            lblPickupLocation.AutoSize = true;
+            lblPickupLocation.Font = new Font("Segoe UI", 10F);
+            lblPickupLocation.Location = new Point(20, 35);
+            lblPickupLocation.Name = "lblPickupLocation";
+            lblPickupLocation.Size = new Size(91, 23);
+            lblPickupLocation.TabIndex = 0;
+            lblPickupLocation.Text = "Location *:";
             // 
             // groupBoxDelivery
             // 
-            this.groupBoxDelivery.Controls.Add(this.txtDeliveryPostal);
-            this.groupBoxDelivery.Controls.Add(this.lblDeliveryPostal);
-            this.groupBoxDelivery.Controls.Add(this.txtDeliveryCity);
-            this.groupBoxDelivery.Controls.Add(this.lblDeliveryCity);
-            this.groupBoxDelivery.Controls.Add(this.txtDeliveryAddress);
-            this.groupBoxDelivery.Controls.Add(this.lblDeliveryAddress);
-            this.groupBoxDelivery.Controls.Add(this.txtDeliveryLocation);
-            this.groupBoxDelivery.Controls.Add(this.lblDeliveryLocation);
-            this.groupBoxDelivery.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
-            this.groupBoxDelivery.Location = new System.Drawing.Point(370, 80);
-            this.groupBoxDelivery.Name = "groupBoxDelivery";
-            this.groupBoxDelivery.Size = new System.Drawing.Size(320, 180);
-            this.groupBoxDelivery.TabIndex = 2;
-            this.groupBoxDelivery.TabStop = false;
-            this.groupBoxDelivery.Text = "🎯 Delivery Location";
-            // 
-            // lblDeliveryLocation
-            // 
-            this.lblDeliveryLocation.AutoSize = true;
-            this.lblDeliveryLocation.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblDeliveryLocation.Location = new System.Drawing.Point(20, 35);
-            this.lblDeliveryLocation.Name = "lblDeliveryLocation";
-            this.lblDeliveryLocation.Size = new System.Drawing.Size(82, 23);
-            this.lblDeliveryLocation.TabIndex = 0;
-            this.lblDeliveryLocation.Text = "Location *:";
-            // 
-            // txtDeliveryLocation
-            // 
-            this.txtDeliveryLocation.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtDeliveryLocation.Location = new System.Drawing.Point(110, 32);
-            this.txtDeliveryLocation.Name = "txtDeliveryLocation";
-            this.txtDeliveryLocation.Size = new System.Drawing.Size(180, 30);
-            this.txtDeliveryLocation.TabIndex = 1;
-            // 
-            // lblDeliveryAddress
-            // 
-            this.lblDeliveryAddress.AutoSize = true;
-            this.lblDeliveryAddress.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblDeliveryAddress.Location = new System.Drawing.Point(20, 70);
-            this.lblDeliveryAddress.Name = "lblDeliveryAddress";
-            this.lblDeliveryAddress.Size = new System.Drawing.Size(79, 23);
-            this.lblDeliveryAddress.TabIndex = 2;
-            this.lblDeliveryAddress.Text = "Address *:";
-            // 
-            // txtDeliveryAddress
-            // 
-            this.txtDeliveryAddress.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtDeliveryAddress.Location = new System.Drawing.Point(110, 67);
-            this.txtDeliveryAddress.Name = "txtDeliveryAddress";
-            this.txtDeliveryAddress.Size = new System.Drawing.Size(180, 30);
-            this.txtDeliveryAddress.TabIndex = 3;
-            // 
-            // lblDeliveryCity
-            // 
-            this.lblDeliveryCity.AutoSize = true;
-            this.lblDeliveryCity.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblDeliveryCity.Location = new System.Drawing.Point(20, 105);
-            this.lblDeliveryCity.Name = "lblDeliveryCity";
-            this.lblDeliveryCity.Size = new System.Drawing.Size(50, 23);
-            this.lblDeliveryCity.TabIndex = 4;
-            this.lblDeliveryCity.Text = "City *:";
-            // 
-            // txtDeliveryCity
-            // 
-            this.txtDeliveryCity.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtDeliveryCity.Location = new System.Drawing.Point(110, 102);
-            this.txtDeliveryCity.Name = "txtDeliveryCity";
-            this.txtDeliveryCity.Size = new System.Drawing.Size(120, 30);
-            this.txtDeliveryCity.TabIndex = 5;
-            // 
-            // lblDeliveryPostal
-            // 
-            this.lblDeliveryPostal.AutoSize = true;
-            this.lblDeliveryPostal.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblDeliveryPostal.Location = new System.Drawing.Point(20, 140);
-            this.lblDeliveryPostal.Name = "lblDeliveryPostal";
-            this.lblDeliveryPostal.Size = new System.Drawing.Size(97, 23);
-            this.lblDeliveryPostal.TabIndex = 6;
-            this.lblDeliveryPostal.Text = "Postal Code:";
+            groupBoxDelivery.Controls.Add(txtDeliveryPostal);
+            groupBoxDelivery.Controls.Add(lblDeliveryPostal);
+            groupBoxDelivery.Controls.Add(txtDeliveryCity);
+            groupBoxDelivery.Controls.Add(lblDeliveryCity);
+            groupBoxDelivery.Controls.Add(txtDeliveryAddress);
+            groupBoxDelivery.Controls.Add(lblDeliveryAddress);
+            groupBoxDelivery.Controls.Add(txtDeliveryLocation);
+            groupBoxDelivery.Controls.Add(lblDeliveryLocation);
+            groupBoxDelivery.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            groupBoxDelivery.Location = new Point(370, 80);
+            groupBoxDelivery.Name = "groupBoxDelivery";
+            groupBoxDelivery.Size = new Size(320, 180);
+            groupBoxDelivery.TabIndex = 2;
+            groupBoxDelivery.TabStop = false;
+            groupBoxDelivery.Text = "🎯 Delivery Location";
             // 
             // txtDeliveryPostal
             // 
-            this.txtDeliveryPostal.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtDeliveryPostal.Location = new System.Drawing.Point(130, 137);
-            this.txtDeliveryPostal.Name = "txtDeliveryPostal";
-            this.txtDeliveryPostal.Size = new System.Drawing.Size(100, 30);
-            this.txtDeliveryPostal.TabIndex = 7;
+            txtDeliveryPostal.Font = new Font("Segoe UI", 10F);
+            txtDeliveryPostal.Location = new Point(130, 137);
+            txtDeliveryPostal.Name = "txtDeliveryPostal";
+            txtDeliveryPostal.Size = new Size(100, 30);
+            txtDeliveryPostal.TabIndex = 7;
+            // 
+            // lblDeliveryPostal
+            // 
+            lblDeliveryPostal.AutoSize = true;
+            lblDeliveryPostal.Font = new Font("Segoe UI", 10F);
+            lblDeliveryPostal.Location = new Point(20, 140);
+            lblDeliveryPostal.Name = "lblDeliveryPostal";
+            lblDeliveryPostal.Size = new Size(104, 23);
+            lblDeliveryPostal.TabIndex = 6;
+            lblDeliveryPostal.Text = "Postal Code:";
+            // 
+            // txtDeliveryCity
+            // 
+            txtDeliveryCity.Font = new Font("Segoe UI", 10F);
+            txtDeliveryCity.Location = new Point(110, 102);
+            txtDeliveryCity.Name = "txtDeliveryCity";
+            txtDeliveryCity.Size = new Size(120, 30);
+            txtDeliveryCity.TabIndex = 5;
+            // 
+            // lblDeliveryCity
+            // 
+            lblDeliveryCity.AutoSize = true;
+            lblDeliveryCity.Font = new Font("Segoe UI", 10F);
+            lblDeliveryCity.Location = new Point(20, 105);
+            lblDeliveryCity.Name = "lblDeliveryCity";
+            lblDeliveryCity.Size = new Size(55, 23);
+            lblDeliveryCity.TabIndex = 4;
+            lblDeliveryCity.Text = "City *:";
+            // 
+            // txtDeliveryAddress
+            // 
+            txtDeliveryAddress.Font = new Font("Segoe UI", 10F);
+            txtDeliveryAddress.Location = new Point(110, 67);
+            txtDeliveryAddress.Name = "txtDeliveryAddress";
+            txtDeliveryAddress.Size = new Size(180, 30);
+            txtDeliveryAddress.TabIndex = 3;
+            // 
+            // lblDeliveryAddress
+            // 
+            lblDeliveryAddress.AutoSize = true;
+            lblDeliveryAddress.Font = new Font("Segoe UI", 10F);
+            lblDeliveryAddress.Location = new Point(20, 70);
+            lblDeliveryAddress.Name = "lblDeliveryAddress";
+            lblDeliveryAddress.Size = new Size(86, 23);
+            lblDeliveryAddress.TabIndex = 2;
+            lblDeliveryAddress.Text = "Address *:";
+            // 
+            // txtDeliveryLocation
+            // 
+            txtDeliveryLocation.Font = new Font("Segoe UI", 10F);
+            txtDeliveryLocation.Location = new Point(110, 32);
+            txtDeliveryLocation.Name = "txtDeliveryLocation";
+            txtDeliveryLocation.Size = new Size(180, 30);
+            txtDeliveryLocation.TabIndex = 1;
+            // 
+            // lblDeliveryLocation
+            // 
+            lblDeliveryLocation.AutoSize = true;
+            lblDeliveryLocation.Font = new Font("Segoe UI", 10F);
+            lblDeliveryLocation.Location = new Point(20, 35);
+            lblDeliveryLocation.Name = "lblDeliveryLocation";
+            lblDeliveryLocation.Size = new Size(91, 23);
+            lblDeliveryLocation.TabIndex = 0;
+            lblDeliveryLocation.Text = "Location *:";
             // 
             // groupBoxJobDetails
             // 
-            this.groupBoxJobDetails.Controls.Add(this.txtSpecialInstructions);
-            this.groupBoxJobDetails.Controls.Add(this.lblSpecialInstructions);
-            this.groupBoxJobDetails.Controls.Add(this.comboBoxPriority);
-            this.groupBoxJobDetails.Controls.Add(this.lblPriority);
-            this.groupBoxJobDetails.Controls.Add(this.dateTimePickerScheduled);
-            this.groupBoxJobDetails.Controls.Add(this.lblScheduledDate);
-            this.groupBoxJobDetails.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Bold);
-            this.groupBoxJobDetails.Location = new System.Drawing.Point(30, 280);
-            this.groupBoxJobDetails.Name = "groupBoxJobDetails";
-            this.groupBoxJobDetails.Size = new System.Drawing.Size(660, 150);
-            this.groupBoxJobDetails.TabIndex = 3;
-            this.groupBoxJobDetails.TabStop = false;
-            this.groupBoxJobDetails.Text = "📋 Job Details";
-            // 
-            // lblScheduledDate
-            // 
-            this.lblScheduledDate.AutoSize = true;
-            this.lblScheduledDate.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblScheduledDate.Location = new System.Drawing.Point(20, 35);
-            this.lblScheduledDate.Name = "lblScheduledDate";
-            this.lblScheduledDate.Size = new System.Drawing.Size(131, 23);
-            this.lblScheduledDate.TabIndex = 0;
-            this.lblScheduledDate.Text = "Preferred Date *:";
-            // 
-            // dateTimePickerScheduled
-            // 
-            this.dateTimePickerScheduled.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.dateTimePickerScheduled.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dateTimePickerScheduled.Location = new System.Drawing.Point(160, 32);
-            this.dateTimePickerScheduled.MinDate = new System.DateTime(2024, 1, 1, 0, 0, 0, 0);
-            this.dateTimePickerScheduled.Name = "dateTimePickerScheduled";
-            this.dateTimePickerScheduled.Size = new System.Drawing.Size(150, 30);
-            this.dateTimePickerScheduled.TabIndex = 1;
-            this.dateTimePickerScheduled.Value = new System.DateTime(2025, 7, 19, 0, 0, 0, 0);
-            // 
-            // lblPriority
-            // 
-            this.lblPriority.AutoSize = true;
-            this.lblPriority.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblPriority.Location = new System.Drawing.Point(350, 35);
-            this.lblPriority.Name = "lblPriority";
-            this.lblPriority.Size = new System.Drawing.Size(69, 23);
-            this.lblPriority.TabIndex = 2;
-            this.lblPriority.Text = "Priority:";
-            // 
-            // comboBoxPriority
-            // 
-            this.comboBoxPriority.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxPriority.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.comboBoxPriority.FormattingEnabled = true;
-            this.comboBoxPriority.Items.AddRange(new object[] {
-            "Low",
-            "Medium",
-            "High",
-            "Urgent"});
-            this.comboBoxPriority.Location = new System.Drawing.Point(430, 32);
-            this.comboBoxPriority.Name = "comboBoxPriority";
-            this.comboBoxPriority.Size = new System.Drawing.Size(120, 31);
-            this.comboBoxPriority.TabIndex = 3;
-            // 
-            // lblSpecialInstructions
-            // 
-            this.lblSpecialInstructions.AutoSize = true;
-            this.lblSpecialInstructions.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblSpecialInstructions.Location = new System.Drawing.Point(20, 80);
-            this.lblSpecialInstructions.Name = "lblSpecialInstructions";
-            this.lblSpecialInstructions.Size = new System.Drawing.Size(148, 23);
-            this.lblSpecialInstructions.TabIndex = 4;
-            this.lblSpecialInstructions.Text = "Special Instructions:";
+            groupBoxJobDetails.Controls.Add(txtSpecialInstructions);
+            groupBoxJobDetails.Controls.Add(lblSpecialInstructions);
+            groupBoxJobDetails.Controls.Add(comboBoxPriority);
+            groupBoxJobDetails.Controls.Add(lblPriority);
+            groupBoxJobDetails.Controls.Add(dateTimePickerScheduled);
+            groupBoxJobDetails.Controls.Add(lblScheduledDate);
+            groupBoxJobDetails.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            groupBoxJobDetails.Location = new Point(30, 280);
+            groupBoxJobDetails.Name = "groupBoxJobDetails";
+            groupBoxJobDetails.Size = new Size(660, 150);
+            groupBoxJobDetails.TabIndex = 3;
+            groupBoxJobDetails.TabStop = false;
+            groupBoxJobDetails.Text = "📋 Job Details";
             // 
             // txtSpecialInstructions
             // 
-            this.txtSpecialInstructions.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtSpecialInstructions.Location = new System.Drawing.Point(20, 110);
-            this.txtSpecialInstructions.Multiline = true;
-            this.txtSpecialInstructions.Name = "txtSpecialInstructions";
-            this.txtSpecialInstructions.Size = new System.Drawing.Size(620, 25);
-            this.txtSpecialInstructions.TabIndex = 5;
+            txtSpecialInstructions.Font = new Font("Segoe UI", 10F);
+            txtSpecialInstructions.Location = new Point(20, 110);
+            txtSpecialInstructions.Multiline = true;
+            txtSpecialInstructions.Name = "txtSpecialInstructions";
+            txtSpecialInstructions.Size = new Size(620, 25);
+            txtSpecialInstructions.TabIndex = 5;
+            // 
+            // lblSpecialInstructions
+            // 
+            lblSpecialInstructions.AutoSize = true;
+            lblSpecialInstructions.Font = new Font("Segoe UI", 10F);
+            lblSpecialInstructions.Location = new Point(20, 80);
+            lblSpecialInstructions.Name = "lblSpecialInstructions";
+            lblSpecialInstructions.Size = new Size(161, 23);
+            lblSpecialInstructions.TabIndex = 4;
+            lblSpecialInstructions.Text = "Special Instructions:";
+            // 
+            // comboBoxPriority
+            // 
+            comboBoxPriority.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBoxPriority.Font = new Font("Segoe UI", 10F);
+            comboBoxPriority.FormattingEnabled = true;
+            comboBoxPriority.Items.AddRange(new object[] { "Low", "Medium", "High", "Urgent" });
+            comboBoxPriority.Location = new Point(430, 32);
+            comboBoxPriority.Name = "comboBoxPriority";
+            comboBoxPriority.Size = new Size(120, 31);
+            comboBoxPriority.TabIndex = 3;
+            // 
+            // lblPriority
+            // 
+            lblPriority.AutoSize = true;
+            lblPriority.Font = new Font("Segoe UI", 10F);
+            lblPriority.Location = new Point(350, 35);
+            lblPriority.Name = "lblPriority";
+            lblPriority.Size = new Size(68, 23);
+            lblPriority.TabIndex = 2;
+            lblPriority.Text = "Priority:";
+            // 
+            // dateTimePickerScheduled
+            // 
+            dateTimePickerScheduled.Font = new Font("Segoe UI", 10F);
+            dateTimePickerScheduled.Format = DateTimePickerFormat.Short;
+            dateTimePickerScheduled.Location = new Point(160, 32);
+            dateTimePickerScheduled.MinDate = new DateTime(2024, 1, 1, 0, 0, 0, 0);
+            dateTimePickerScheduled.Name = "dateTimePickerScheduled";
+            dateTimePickerScheduled.Size = new Size(150, 30);
+            dateTimePickerScheduled.TabIndex = 1;
+            dateTimePickerScheduled.Value = new DateTime(2025, 7, 19, 0, 0, 0, 0);
+            // 
+            // lblScheduledDate
+            // 
+            lblScheduledDate.AutoSize = true;
+            lblScheduledDate.Font = new Font("Segoe UI", 10F);
+            lblScheduledDate.Location = new Point(20, 35);
+            lblScheduledDate.Name = "lblScheduledDate";
+            lblScheduledDate.Size = new Size(137, 23);
+            lblScheduledDate.TabIndex = 0;
+            lblScheduledDate.Text = "Preferred Date *:";
             // 
             // btnSubmitRequest
             // 
-            this.btnSubmitRequest.BackColor = System.Drawing.Color.LightGreen;
-            this.btnSubmitRequest.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            this.btnSubmitRequest.Location = new System.Drawing.Point(250, 460);
-            this.btnSubmitRequest.Name = "btnSubmitRequest";
-            this.btnSubmitRequest.Size = new System.Drawing.Size(150, 40);
-            this.btnSubmitRequest.TabIndex = 4;
-            this.btnSubmitRequest.Text = "Submit Request";
-            this.btnSubmitRequest.UseVisualStyleBackColor = false;
-            this.btnSubmitRequest.Click += new System.EventHandler(this.btnSubmitRequest_Click);
+            btnSubmitRequest.BackColor = Color.LightGreen;
+            btnSubmitRequest.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            btnSubmitRequest.Location = new Point(230, 640);
+            btnSubmitRequest.Name = "btnSubmitRequest";
+            btnSubmitRequest.Size = new Size(150, 40);
+            btnSubmitRequest.TabIndex = 4;
+            btnSubmitRequest.Text = "Submit Request";
+            btnSubmitRequest.UseVisualStyleBackColor = false;
+            btnSubmitRequest.Click += btnSubmitRequest_Click;
             // 
             // btnCancel
             // 
-            this.btnCancel.BackColor = System.Drawing.Color.LightCoral;
-            this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            this.btnCancel.Location = new System.Drawing.Point(420, 460);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(100, 40);
-            this.btnCancel.TabIndex = 5;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.UseVisualStyleBackColor = false;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            btnCancel.BackColor = Color.LightCoral;
+            btnCancel.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            btnCancel.Location = new Point(390, 640);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(130, 40);
+            btnCancel.TabIndex = 5;
+            btnCancel.Text = "Cancel";
+            btnCancel.UseVisualStyleBackColor = false;
+            btnCancel.Click += btnCancel_Click;
             // 
             // lblStatus
             // 
-            this.lblStatus.AutoSize = true;
-            this.lblStatus.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblStatus.Location = new System.Drawing.Point(30, 520);
-            this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(0, 23);
-            this.lblStatus.TabIndex = 6;
+            lblStatus.AutoSize = true;
+            lblStatus.Font = new Font("Segoe UI", 10F);
+            lblStatus.Location = new Point(30, 520);
+            lblStatus.Name = "lblStatus";
+            lblStatus.Size = new Size(0, 23);
+            lblStatus.TabIndex = 6;
+            // 
+            // groupBoxProductSelection
+            // 
+            groupBoxProductSelection.Controls.Add(lblSelectProducts);
+            groupBoxProductSelection.Controls.Add(dgvProductSelection);
+            groupBoxProductSelection.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            groupBoxProductSelection.Location = new Point(30, 350);
+            groupBoxProductSelection.Name = "groupBoxProductSelection";
+            groupBoxProductSelection.Size = new Size(660, 200);
+            groupBoxProductSelection.TabIndex = 7;
+            groupBoxProductSelection.TabStop = false;
+            groupBoxProductSelection.Text = "📦 Select Items to Move";
+            // 
+            // lblSelectProducts
+            // 
+            lblSelectProducts.AutoSize = true;
+            lblSelectProducts.Font = new Font("Segoe UI", 9F);
+            lblSelectProducts.Location = new Point(20, 25);
+            lblSelectProducts.Name = "lblSelectProducts";
+            lblSelectProducts.Size = new Size(362, 20);
+            lblSelectProducts.TabIndex = 0;
+            lblSelectProducts.Text = "Check items you want to move and specify quantities:";
+            // 
+            // dgvProductSelection
+            // 
+            dgvProductSelection.AllowUserToAddRows = false;
+            dgvProductSelection.AllowUserToDeleteRows = false;
+            dgvProductSelection.AllowUserToResizeRows = false;
+            dgvProductSelection.BackgroundColor = Color.White;
+            dgvProductSelection.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvProductSelection.Location = new Point(20, 50);
+            dgvProductSelection.Name = "dgvProductSelection";
+            dgvProductSelection.RowHeadersVisible = false;
+            dgvProductSelection.RowHeadersWidth = 51;
+            dgvProductSelection.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvProductSelection.Size = new Size(620, 140);
+            dgvProductSelection.TabIndex = 1;
+            dgvProductSelection.CellValueChanged += dgvProductSelection_CellValueChanged;
+            // 
+            // groupBoxCalculatedTotals
+            // 
+            groupBoxCalculatedTotals.Controls.Add(lblTotalWeight);
+            groupBoxCalculatedTotals.Controls.Add(lblWeightValue);
+            groupBoxCalculatedTotals.Controls.Add(lblTotalVolume);
+            groupBoxCalculatedTotals.Controls.Add(lblVolumeValue);
+            groupBoxCalculatedTotals.Controls.Add(lblEstimatedCost);
+            groupBoxCalculatedTotals.Controls.Add(lblCostValue);
+            groupBoxCalculatedTotals.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            groupBoxCalculatedTotals.Location = new Point(30, 560);
+            groupBoxCalculatedTotals.Name = "groupBoxCalculatedTotals";
+            groupBoxCalculatedTotals.Size = new Size(660, 60);
+            groupBoxCalculatedTotals.TabIndex = 8;
+            groupBoxCalculatedTotals.TabStop = false;
+            groupBoxCalculatedTotals.Text = "💰 Calculated Totals";
+            // 
+            // lblTotalWeight
+            // 
+            lblTotalWeight.AutoSize = true;
+            lblTotalWeight.Font = new Font("Segoe UI", 10F);
+            lblTotalWeight.Location = new Point(20, 30);
+            lblTotalWeight.Name = "lblTotalWeight";
+            lblTotalWeight.Size = new Size(109, 23);
+            lblTotalWeight.TabIndex = 0;
+            lblTotalWeight.Text = "Total Weight:";
+            // 
+            // lblWeightValue
+            // 
+            lblWeightValue.AutoSize = true;
+            lblWeightValue.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblWeightValue.ForeColor = Color.DarkBlue;
+            lblWeightValue.Location = new Point(130, 30);
+            lblWeightValue.Name = "lblWeightValue";
+            lblWeightValue.Size = new Size(46, 23);
+            lblWeightValue.TabIndex = 1;
+            lblWeightValue.Text = "0 kg";
+            // 
+            // lblTotalVolume
+            // 
+            lblTotalVolume.AutoSize = true;
+            lblTotalVolume.Font = new Font("Segoe UI", 10F);
+            lblTotalVolume.Location = new Point(200, 30);
+            lblTotalVolume.Name = "lblTotalVolume";
+            lblTotalVolume.Size = new Size(113, 23);
+            lblTotalVolume.TabIndex = 2;
+            lblTotalVolume.Text = "Total Volume:";
+            // 
+            // lblVolumeValue
+            // 
+            lblVolumeValue.AutoSize = true;
+            lblVolumeValue.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblVolumeValue.ForeColor = Color.DarkBlue;
+            lblVolumeValue.Location = new Point(310, 30);
+            lblVolumeValue.Name = "lblVolumeValue";
+            lblVolumeValue.Size = new Size(48, 23);
+            lblVolumeValue.TabIndex = 3;
+            lblVolumeValue.Text = "0 m³";
+            // 
+            // lblEstimatedCost
+            // 
+            lblEstimatedCost.AutoSize = true;
+            lblEstimatedCost.Font = new Font("Segoe UI", 10F);
+            lblEstimatedCost.Location = new Point(400, 30);
+            lblEstimatedCost.Name = "lblEstimatedCost";
+            lblEstimatedCost.Size = new Size(128, 23);
+            lblEstimatedCost.TabIndex = 4;
+            lblEstimatedCost.Text = "Estimated Cost:";
+            // 
+            // lblCostValue
+            // 
+            lblCostValue.AutoSize = true;
+            lblCostValue.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
+            lblCostValue.ForeColor = Color.DarkGreen;
+            lblCostValue.Location = new Point(530, 27);
+            lblCostValue.Name = "lblCostValue";
+            lblCostValue.Size = new Size(65, 28);
+            lblCostValue.TabIndex = 5;
+            lblCostValue.Text = "$0.00";
             // 
             // NewJobRequestForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.ClientSize = new System.Drawing.Size(720, 560);
-            this.Controls.Add(this.lblStatus);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnSubmitRequest);
-            this.Controls.Add(this.groupBoxJobDetails);
-            this.Controls.Add(this.groupBoxDelivery);
-            this.Controls.Add(this.groupBoxPickup);
-            this.Controls.Add(this.lblTitle);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.Name = "NewJobRequestForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "e-Shift - New Job Request";
-            this.Load += new System.EventHandler(this.NewJobRequestForm_Load);
-            this.groupBoxPickup.ResumeLayout(false);
-            this.groupBoxPickup.PerformLayout();
-            this.groupBoxDelivery.ResumeLayout(false);
-            this.groupBoxDelivery.PerformLayout();
-            this.groupBoxJobDetails.ResumeLayout(false);
-            this.groupBoxJobDetails.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.WhiteSmoke;
+            ClientSize = new Size(720, 700);
+            Controls.Add(groupBoxProductSelection);
+            Controls.Add(groupBoxCalculatedTotals);
+            Controls.Add(lblStatus);
+            Controls.Add(btnCancel);
+            Controls.Add(btnSubmitRequest);
+            Controls.Add(groupBoxJobDetails);
+            Controls.Add(groupBoxDelivery);
+            Controls.Add(groupBoxPickup);
+            Controls.Add(lblTitle);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            Name = "NewJobRequestForm";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "e-Shift - New Job Request";
+            Load += NewJobRequestForm_Load;
+            groupBoxPickup.ResumeLayout(false);
+            groupBoxPickup.PerformLayout();
+            groupBoxDelivery.ResumeLayout(false);
+            groupBoxDelivery.PerformLayout();
+            groupBoxJobDetails.ResumeLayout(false);
+            groupBoxJobDetails.PerformLayout();
+            groupBoxProductSelection.ResumeLayout(false);
+            groupBoxProductSelection.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvProductSelection).EndInit();
+            groupBoxCalculatedTotals.ResumeLayout(false);
+            groupBoxCalculatedTotals.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -416,5 +549,16 @@
         private System.Windows.Forms.Button btnSubmitRequest;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Label lblStatus;
+
+        private System.Windows.Forms.GroupBox groupBoxProductSelection;
+        private System.Windows.Forms.Label lblSelectProducts;
+        private System.Windows.Forms.DataGridView dgvProductSelection;
+        private System.Windows.Forms.GroupBox groupBoxCalculatedTotals;
+        private System.Windows.Forms.Label lblTotalWeight;
+        private System.Windows.Forms.Label lblTotalVolume;
+        private System.Windows.Forms.Label lblEstimatedCost;
+        private System.Windows.Forms.Label lblWeightValue;
+        private System.Windows.Forms.Label lblVolumeValue;
+        private System.Windows.Forms.Label lblCostValue;
     }
 }

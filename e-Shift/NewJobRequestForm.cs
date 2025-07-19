@@ -1,9 +1,10 @@
-﻿using System;
+﻿using e_Shift.Database;
+using e_Shift.Utils;
+using Microsoft.Data.SqlClient;
+using System;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-using Microsoft.Data.SqlClient;
-using e_Shift.Database;
-using e_Shift.Utils;
 
 namespace e_Shift
 {
@@ -32,8 +33,161 @@ namespace e_Shift
             // Focus on first field
             txtPickupLocation.Focus();
 
+            LoadAvailableProducts();
+
             ShowMessage("Fill in the details for your transport request", false);
         }
+
+
+
+        private void LoadAvailableProducts()
+        {
+            try
+            {
+                string query = @"
+            SELECT ProductID, ProductName, Category, DefaultWeight, DefaultVolume, PricePerUnit,
+                   HandlingRequirements, IsFragile
+            FROM Products 
+            WHERE IsActive = 1 AND IsDeleted = 0
+            ORDER BY Category, ProductName";
+
+                DataTable productsTable = DatabaseConnection.FillDataTable(query);
+
+                if (productsTable != null)
+                {
+                    // Add checkbox and quantity columns
+                    DataTable displayTable = new DataTable();
+                    displayTable.Columns.Add("Select", typeof(bool));
+                    displayTable.Columns.Add("ProductID", typeof(int));
+                    displayTable.Columns.Add("Product Name", typeof(string));
+                    displayTable.Columns.Add("Category", typeof(string));
+                    displayTable.Columns.Add("Weight (kg)", typeof(decimal));
+                    displayTable.Columns.Add("Volume (m³)", typeof(decimal));
+                    displayTable.Columns.Add("Price/Unit", typeof(decimal));
+                    displayTable.Columns.Add("Quantity", typeof(int));
+                    displayTable.Columns.Add("Fragile", typeof(string));
+
+                    foreach (DataRow row in productsTable.Rows)
+                    {
+                        DataRow newRow = displayTable.NewRow();
+                        newRow["Select"] = false;
+                        newRow["ProductID"] = row["ProductID"];
+                        newRow["Product Name"] = row["ProductName"];
+                        newRow["Category"] = row["Category"];
+                        newRow["Weight (kg)"] = row["DefaultWeight"];
+                        newRow["Volume (m³)"] = row["DefaultVolume"];
+                        newRow["Price/Unit"] = row["PricePerUnit"];
+                        newRow["Quantity"] = 0;
+                        newRow["Fragile"] = Convert.ToBoolean(row["IsFragile"]) ? "Yes" : "No";
+                        displayTable.Rows.Add(newRow);
+                    }
+
+                    dgvProductSelection.DataSource = displayTable;
+
+                    // Configure columns
+                    dgvProductSelection.Columns["ProductID"].Visible = false;
+                    dgvProductSelection.Columns["Select"].Width = 60;
+                    dgvProductSelection.Columns["Product Name"].Width = 150;
+                    dgvProductSelection.Columns["Category"].Width = 80;
+                    dgvProductSelection.Columns["Weight (kg)"].Width = 80;
+                    dgvProductSelection.Columns["Volume (m³)"].Width = 80;
+                    dgvProductSelection.Columns["Price/Unit"].Width = 80;
+                    dgvProductSelection.Columns["Quantity"].Width = 70;
+                    dgvProductSelection.Columns["Fragile"].Width = 60;
+
+                    // Make columns editable
+                    dgvProductSelection.Columns["Select"].ReadOnly = false;
+                    dgvProductSelection.Columns["Quantity"].ReadOnly = false;
+                    foreach (DataGridViewColumn col in dgvProductSelection.Columns)
+                    {
+                        if (col.Name != "Select" && col.Name != "Quantity")
+                            col.ReadOnly = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error loading products: {ex.Message}", true);
+            }
+        }
+
+
+
+        private void dgvProductSelection_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                DataGridViewRow row = dgvProductSelection.Rows[e.RowIndex];
+
+                // If Select checkbox changed
+                if (e.ColumnIndex == dgvProductSelection.Columns["Select"].Index)
+                {
+                    bool isSelected = Convert.ToBoolean(row.Cells["Select"].Value);
+                    if (isSelected && Convert.ToInt32(row.Cells["Quantity"].Value) == 0)
+                    {
+                        row.Cells["Quantity"].Value = 1; // Default quantity
+                    }
+                    else if (!isSelected)
+                    {
+                        row.Cells["Quantity"].Value = 0;
+                    }
+                }
+
+                // If Quantity changed
+                if (e.ColumnIndex == dgvProductSelection.Columns["Quantity"].Index)
+                {
+                    int quantity = Convert.ToInt32(row.Cells["Quantity"].Value);
+                    row.Cells["Select"].Value = quantity > 0;
+                }
+
+                // Recalculate totals
+                CalculateTotals();
+            }
+        }
+
+        private void CalculateTotals()
+        {
+            try
+            {
+                decimal totalWeight = 0;
+                decimal totalVolume = 0;
+                decimal totalCost = 0;
+
+                foreach (DataGridViewRow row in dgvProductSelection.Rows)
+                {
+                    bool isSelected = Convert.ToBoolean(row.Cells["Select"].Value);
+                    if (isSelected)
+                    {
+                        int quantity = Convert.ToInt32(row.Cells["Quantity"].Value);
+                        decimal weight = Convert.ToDecimal(row.Cells["Weight (kg)"].Value);
+                        decimal volume = Convert.ToDecimal(row.Cells["Volume (m³)"].Value);
+                        decimal pricePerUnit = Convert.ToDecimal(row.Cells["Price/Unit"].Value);
+
+                        totalWeight += weight * quantity;
+                        totalVolume += volume * quantity;
+                        totalCost += pricePerUnit * quantity;
+                    }
+                }
+
+                // Apply priority multiplier
+                decimal priorityMultiplier = 1.0m;
+                if (comboBoxPriority.Text == "High" || comboBoxPriority.Text == "Urgent")
+                    priorityMultiplier = 1.5m;
+
+                totalCost *= priorityMultiplier;
+
+                // Update display
+                lblWeightValue.Text = $"{totalWeight} kg";
+                lblVolumeValue.Text = $"{totalVolume} m³";
+                lblCostValue.Text = $"${totalCost:F2}";
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error calculating totals: {ex.Message}", true);
+            }
+        }
+
+
 
         private void btnSubmitRequest_Click(object sender, EventArgs e)
         {
@@ -132,6 +286,21 @@ namespace e_Shift
             {
                 ShowMessage("Please select a priority level", true);
                 comboBoxPriority.Focus();
+                return false;
+            }
+            bool hasSelectedProducts = false;
+            foreach (DataGridViewRow row in dgvProductSelection.Rows)
+            {
+                if (Convert.ToBoolean(row.Cells["Select"].Value))
+                {
+                    hasSelectedProducts = true;
+                    break;
+                }
+            }
+
+            if (!hasSelectedProducts)
+            {
+                ShowMessage("Please select at least one item to move", true);
                 return false;
             }
 

@@ -177,13 +177,19 @@ namespace e_Shift
 
         private void btnReports_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Reports form will be created later!\n\n" +
-                          "This will allow you to:\n" +
-                          "• Generate customer reports\n" +
-                          "• Generate revenue reports\n" +
-                          "• Generate job statistics\n" +
-                          "• Export data to PDF/Excel",
-                          "Coming Soon", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                // Open Reports form
+                ReportsForm reportsForm = new ReportsForm();
+                reportsForm.ShowDialog();
+
+                // Optional: Refresh dashboard statistics after reports
+                LoadDashboardData();
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error opening reports: {ex.Message}", true);
+            }
         }
 
         private void btnUserProfile_Click(object sender, EventArgs e)
@@ -233,6 +239,31 @@ namespace e_Shift
 
             // Show welcome message
             ShowMessage($"Welcome to e-Shift Admin Dashboard, {UserSession.GetFullName()}!", false);
+
+            // Test database connection for reports
+            TestReportsConnection();
+
+        }
+        private void TestReportsConnection()
+        {
+            try
+            {
+                // Test if we can access reports data
+                string testQuery = "SELECT COUNT(*) FROM Jobs WHERE IsDeleted = 0";
+                object result = DatabaseConnection.ExecuteScalar(testQuery);
+
+                if (result != null)
+                {
+                    // Reports functionality is available
+                    btnReports.Text = "📊 Reports";
+                    btnReports.Enabled = true;
+                }
+            }
+            catch (Exception)
+            {
+                // Keep reports button but show warning
+                btnReports.Text = "📊 Reports (Limited)";
+            }
         }
 
         private void AdminDashboard_FormClosing(object sender, FormClosingEventArgs e)
