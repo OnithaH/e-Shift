@@ -30,7 +30,6 @@ namespace e_Shift
         {
             InitializeComponent();
             CheckAdminAccess();
-            LoadCustomers();
             SetFormState(FormState.Viewing);
         }
 
@@ -96,6 +95,8 @@ namespace e_Shift
 
         private void FormatCustomerGrid()
         {
+            if (dataGridViewCustomers == null) return;
+
             if (dataGridViewCustomers.Columns.Count > 0)
             {
                 dataGridViewCustomers.Columns["CustomerID"].Visible = false;
@@ -512,6 +513,7 @@ namespace e_Shift
         private void CustomerManagementForm_Load(object sender, EventArgs e)
         {
             comboBoxStatusFilter.SelectedIndex = 0; // Select "All"
+            LoadCustomers();
         }
 
         private void dataGridViewCustomers_SelectionChanged(object sender, EventArgs e)

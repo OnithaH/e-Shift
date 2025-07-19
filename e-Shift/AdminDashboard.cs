@@ -112,13 +112,19 @@ namespace e_Shift
         // Navigation button click events - Show placeholder messages for now
         private void btnCustomerManagement_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Customer Management form will be created next!\n\n" +
-                          "This will allow you to:\n" +
-                          "• View all customers\n" +
-                          "• Add new customers\n" +
-                          "• Edit customer details\n" +
-                          "• Activate/Deactivate customers",
-                          "Coming Soon", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                // Open Customer Management form
+                CustomerManagementForm customerManagementForm = new CustomerManagementForm();
+                customerManagementForm.ShowDialog();
+
+                // Refresh dashboard statistics after customer management
+                LoadDashboardData();
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error opening customer management: {ex.Message}", true);
+            }
         }
 
         private void btnProductManagement_Click(object sender, EventArgs e)
