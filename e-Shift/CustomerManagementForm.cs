@@ -355,9 +355,9 @@ namespace e_Shift
             {
                 string query = @"
                     INSERT INTO Customers (FirstName, LastName, Email, Phone, Address, City, PostalCode, 
-                                         IsActive, Password, Salt, CreatedDate, ModifiedDate)
+                                         IsActive, Password, CreatedDate, ModifiedDate)
                     VALUES (@FirstName, @LastName, @Email, @Phone, @Address, @City, @PostalCode, 
-                           @IsActive, @Password, @Salt, @CreatedDate, @ModifiedDate)";
+                           @IsActive, @Password, @CreatedDate, @ModifiedDate)";
 
                 // Generate default password for new customers
                 string defaultPassword = "customer123";
@@ -373,7 +373,6 @@ namespace e_Shift
                     new SqlParameter("@PostalCode", string.IsNullOrEmpty(txtPostalCode.Text) ? (object)DBNull.Value : txtPostalCode.Text.Trim()),
                     new SqlParameter("@IsActive", chkIsActive.Checked),
                     new SqlParameter("@Password", passwordHash),
-                    new SqlParameter("@Salt", new byte[16]), // Placeholder for salt
                     new SqlParameter("@CreatedDate", DateTime.Now),
                     new SqlParameter("@ModifiedDate", DateTime.Now)
                 };
