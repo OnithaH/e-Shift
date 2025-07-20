@@ -227,51 +227,83 @@ namespace e_Shift
         {
             try
             {
+                // Query to get detailed load information with products
                 string query = @"
             SELECT 
-                l.Description,
-                l.Weight,
-                l.Volume,
-                l.LoadCost,
-                COUNT(lp.LoadProductID) as ProductCount
+                l.Weight as TotalWeight,
+                l.Volume as TotalVolume,
+                l.LoadCost as TotalCost,
+                l.Description as LoadDescription,
+                lp.Quantity,
+                lp.UnitWeight,
+                lp.UnitVolume,
+                lp.UnitPrice,
+                lp.TotalPrice,
+                p.ProductName,
+                p.Category,
+                p.IsFragile
             FROM Loads l
             LEFT JOIN LoadProducts lp ON l.LoadID = lp.LoadID
+            LEFT JOIN Products p ON lp.ProductID = p.ProductID
             WHERE l.JobID = @JobID AND l.IsDeleted = 0
-            GROUP BY l.LoadID, l.Description, l.Weight, l.Volume, l.LoadCost";
+            ORDER BY p.Category, p.ProductName";
 
                 SqlParameter[] parameters = {
             new SqlParameter("@JobID", jobId)
         };
 
-                using (SqlDataReader reader = DatabaseConnection.ExecuteReader(query, parameters))
+                DataTable loadData = DatabaseConnection.FillDataTable(query, parameters);
+
+                if (loadData != null && loadData.Rows.Count > 0)
                 {
-                    if (reader != null && reader.Read())
+                    // Get totals from first row (same for all rows)
+                    DataRow firstRow = loadData.Rows[0];
+                    decimal totalWeight = Convert.ToDecimal(firstRow["TotalWeight"]);
+                    decimal totalVolume = Convert.ToDecimal(firstRow["TotalVolume"]);
+                    decimal totalCost = Convert.ToDecimal(firstRow["TotalCost"]);
+
+                    // Build detailed product list
+                    System.Text.StringBuilder productDetails = new System.Text.StringBuilder();
+                    int productCount = 0;
+
+                    foreach (DataRow row in loadData.Rows)
                     {
-                        // Display load information
-                        string description = reader["Description"].ToString();
-                        decimal weight = Convert.ToDecimal(reader["Weight"]);
-                        decimal volume = Convert.ToDecimal(reader["Volume"]);
-                        decimal loadCost = Convert.ToDecimal(reader["LoadCost"]);
-                        int productCount = Convert.ToInt32(reader["ProductCount"]);
-
-                        txtLoadDetails.Text = description;
-                        lblWeightValue.Text = $"{weight} kg";
-                        lblVolumeValue.Text = $"{volume} m³";
-                        lblCostValue.Text = $"${loadCost:F2}";
-
-                        if (productCount > 0)
+                        if (row["ProductName"] != DBNull.Value)
                         {
-                            txtLoadDetails.Text += $" ({productCount} different products)";
+                            string productName = row["ProductName"].ToString();
+                            int quantity = Convert.ToInt32(row["Quantity"]);
+                            decimal unitWeight = Convert.ToDecimal(row["UnitWeight"]);
+                            decimal unitVolume = Convert.ToDecimal(row["UnitVolume"]);
+                            decimal totalPrice = Convert.ToDecimal(row["TotalPrice"]);
+                            bool isFragile = Convert.ToBoolean(row["IsFragile"]);
+
+                            string fragileIcon = isFragile ? "⚠️" : "";
+                            productDetails.AppendLine($"• {productName} (Qty: {quantity}) - {unitWeight}kg, {unitVolume}m³, ${totalPrice:F2} {fragileIcon}");
+                            productCount++;
                         }
+                    }
+
+                    // Update display
+                    if (productCount > 0)
+                    {
+                        txtLoadDetails.Text = productDetails.ToString().Trim();
                     }
                     else
                     {
-                        // No load details found
-                        txtLoadDetails.Text = "No load details specified";
-                        lblWeightValue.Text = "Not specified";
-                        lblVolumeValue.Text = "Not specified";
-                        lblCostValue.Text = "$0.00";
+                        txtLoadDetails.Text = firstRow["LoadDescription"].ToString();
                     }
+
+                    lblWeightValue.Text = $"{totalWeight} kg";
+                    lblVolumeValue.Text = $"{totalVolume} m³";
+                    lblCostValue.Text = $"${totalCost:F2}";
+                }
+                else
+                {
+                    // No load details found
+                    txtLoadDetails.Text = "No load details specified";
+                    lblWeightValue.Text = "Not specified";
+                    lblVolumeValue.Text = "Not specified";
+                    lblCostValue.Text = "$0.00";
                 }
             }
             catch (Exception ex)

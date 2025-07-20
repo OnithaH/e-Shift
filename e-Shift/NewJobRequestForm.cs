@@ -313,18 +313,48 @@ namespace e_Shift
         {
             try
             {
-                string query = @"
+                // Step 1: Calculate totals from selected products
+                decimal totalWeight = 0, totalVolume = 0, totalCost = 0;
+                int selectedProductCount = 0;
+
+                foreach (DataGridViewRow row in dgvProductSelection.Rows)
+                {
+                    if (Convert.ToBoolean(row.Cells["Select"].Value))
+                    {
+                        int quantity = Convert.ToInt32(row.Cells["Quantity"].Value);
+                        if (quantity > 0)
+                        {
+                            decimal weight = Convert.ToDecimal(row.Cells["Weight (kg)"].Value);
+                            decimal volume = Convert.ToDecimal(row.Cells["Volume (m³)"].Value);
+                            decimal price = Convert.ToDecimal(row.Cells["Price/Unit"].Value);
+
+                            totalWeight += weight * quantity;
+                            totalVolume += volume * quantity;
+                            totalCost += price * quantity;
+                            selectedProductCount++;
+                        }
+                    }
+                }
+
+                // Apply priority multiplier
+                decimal priorityMultiplier = 1.0m;
+                if (comboBoxPriority.Text == "High" || comboBoxPriority.Text == "Urgent")
+                    priorityMultiplier = 1.5m;
+                totalCost *= priorityMultiplier;
+
+                // Step 2: Create Job record
+                string jobQuery = @"
             INSERT INTO Jobs (
                 CustomerID, StartLocation, StartAddress, StartCity, StartPostalCode,
                 Destination, DestinationAddress, DestinationCity, DestinationPostalCode,
-                ScheduledDate, Priority, SpecialInstructions, Status
+                ScheduledDate, Priority, SpecialInstructions, Status, EstimatedCost
             ) VALUES (
                 @CustomerID, @StartLocation, @StartAddress, @StartCity, @StartPostalCode,
                 @Destination, @DestinationAddress, @DestinationCity, @DestinationPostalCode,
-                @ScheduledDate, @Priority, @SpecialInstructions, @Status
-            )";
+                @ScheduledDate, @Priority, @SpecialInstructions, @Status, @EstimatedCost
+            ); SELECT SCOPE_IDENTITY();";
 
-                SqlParameter[] parameters = {
+                SqlParameter[] jobParameters = {
             new SqlParameter("@CustomerID", UserSession.UserId),
             new SqlParameter("@StartLocation", txtPickupLocation.Text.Trim()),
             new SqlParameter("@StartAddress", txtPickupAddress.Text.Trim()),
@@ -337,27 +367,89 @@ namespace e_Shift
             new SqlParameter("@ScheduledDate", dateTimePickerScheduled.Value.Date),
             new SqlParameter("@Priority", comboBoxPriority.Text),
             new SqlParameter("@SpecialInstructions", string.IsNullOrEmpty(txtSpecialInstructions.Text) ? (object)DBNull.Value : txtSpecialInstructions.Text.Trim()),
+            new SqlParameter("@Status", "Pending"),
+            new SqlParameter("@EstimatedCost", totalCost)
+        };
+
+                // Execute job creation and get JobID
+                object jobResult = DatabaseConnection.ExecuteScalar(jobQuery, jobParameters);
+                if (jobResult == null) return false;
+
+                int newJobID = Convert.ToInt32(jobResult);
+
+                // Step 3: Create Load record
+                string loadQuery = @"
+            INSERT INTO Loads (JobID, Description, Weight, Volume, LoadCost, Status)
+            VALUES (@JobID, @Description, @Weight, @Volume, @LoadCost, @Status);
+            SELECT SCOPE_IDENTITY();";
+
+                SqlParameter[] loadParameters = {
+            new SqlParameter("@JobID", newJobID),
+            new SqlParameter("@Description", $"Household items - {selectedProductCount} product types"),
+            new SqlParameter("@Weight", totalWeight),
+            new SqlParameter("@Volume", totalVolume),
+            new SqlParameter("@LoadCost", totalCost),
             new SqlParameter("@Status", "Pending")
         };
 
-                int result = DatabaseConnection.ExecuteNonQuery(query, parameters);
+                object loadResult = DatabaseConnection.ExecuteScalar(loadQuery, loadParameters);
+                if (loadResult == null) return false;
 
-                if (result > 0)
+                int newLoadID = Convert.ToInt32(loadResult);
+
+                // Step 4: Create LoadProducts records
+                foreach (DataGridViewRow row in dgvProductSelection.Rows)
                 {
-                    // Log the action
-                    LogJobRequest();
-                    return true;
+                    if (Convert.ToBoolean(row.Cells["Select"].Value))
+                    {
+                        int quantity = Convert.ToInt32(row.Cells["Quantity"].Value);
+                        if (quantity > 0)
+                        {
+                            string loadProductQuery = @"
+                        INSERT INTO LoadProducts (LoadID, ProductID, Quantity, UnitWeight, UnitVolume, UnitPrice, TotalPrice)
+                        VALUES (@LoadID, @ProductID, @Quantity, @UnitWeight, @UnitVolume, @UnitPrice, @TotalPrice)";
+
+                            SqlParameter[] loadProductParameters = {
+                        new SqlParameter("@LoadID", newLoadID),
+                        new SqlParameter("@ProductID", Convert.ToInt32(row.Cells["ProductID"].Value)),
+                        new SqlParameter("@Quantity", quantity),
+                        new SqlParameter("@UnitWeight", Convert.ToDecimal(row.Cells["Weight (kg)"].Value)),
+                        new SqlParameter("@UnitVolume", Convert.ToDecimal(row.Cells["Volume (m³)"].Value)),
+                        new SqlParameter("@UnitPrice", Convert.ToDecimal(row.Cells["Price/Unit"].Value)),
+                        new SqlParameter("@TotalPrice", Convert.ToDecimal(row.Cells["Price/Unit"].Value) * quantity)
+                    };
+
+                            DatabaseConnection.ExecuteNonQuery(loadProductQuery, loadProductParameters);
+                        }
+                    }
                 }
-                else
-                {
-                    ShowMessage("Failed to submit job request", true);
-                    return false;
-                }
+
+                // Log the action
+                LogJobRequest();
+                return true;
             }
             catch (Exception ex)
             {
                 ShowMessage($"Error submitting request: {ex.Message}", true);
                 return false;
+            }
+        }
+
+
+
+
+        private int GetLastInsertedJobID()
+        {
+            try
+            {
+                string query = "SELECT SCOPE_IDENTITY()";
+                object result = DatabaseConnection.ExecuteScalar(query);
+                return result != null ? Convert.ToInt32(result) : -1;
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error getting job ID: {ex.Message}", true);
+                return -1;
             }
         }
 
