@@ -1,11 +1,12 @@
-﻿using System;
+﻿using e_Shift.Database;
+using e_Shift.Utils;
+using Microsoft.Data.SqlClient;
+using System;
 using System.Data;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
-using e_Shift.Database;
-using Microsoft.Data.SqlClient;
 
 namespace e_Shift
 {
@@ -178,10 +179,8 @@ namespace e_Shift
 
         private byte[] HashPassword(string password)
         {
-            using (SHA256 sha256Hash = SHA256.Create())
-            {
-                return sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
-            }
+            // Use the same method as PasswordUtils for consistency
+            return PasswordUtils.HashPassword(password);
         }
 
         private void ShowMessage(string message, bool isError)

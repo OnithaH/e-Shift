@@ -48,7 +48,6 @@
             lblApprovedJobs = new Label();
             lblPendingJobs = new Label();
             groupBoxNavigation = new GroupBox();
-            btnUserProfile = new Button();
             btnReports = new Button();
             btnTransportManagement = new Button();
             btnJobManagement = new Button();
@@ -278,7 +277,6 @@
             // 
             // groupBoxNavigation
             // 
-            groupBoxNavigation.Controls.Add(btnUserProfile);
             groupBoxNavigation.Controls.Add(btnReports);
             groupBoxNavigation.Controls.Add(btnTransportManagement);
             groupBoxNavigation.Controls.Add(btnJobManagement);
@@ -291,18 +289,6 @@
             groupBoxNavigation.TabIndex = 5;
             groupBoxNavigation.TabStop = false;
             groupBoxNavigation.Text = "Navigation Menu";
-            // 
-            // btnUserProfile
-            // 
-            btnUserProfile.BackColor = Color.LightSalmon;
-            btnUserProfile.Font = new Font("Segoe UI", 10F);
-            btnUserProfile.Location = new Point(20, 260);
-            btnUserProfile.Name = "btnUserProfile";
-            btnUserProfile.Size = new Size(250, 35);
-            btnUserProfile.TabIndex = 5;
-            btnUserProfile.Text = "👤 User Profile";
-            btnUserProfile.UseVisualStyleBackColor = false;
-            btnUserProfile.Click += btnUserProfile_Click;
             // 
             // btnReports
             // 
@@ -428,7 +414,7 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.WhiteSmoke;
-            ClientSize = new Size(1200, 553);
+            ClientSize = new Size(1217, 553);
             Controls.Add(lblStatus);
             Controls.Add(groupBoxQuickActions);
             Controls.Add(groupBoxNavigation);
@@ -479,7 +465,6 @@
         private Button btnJobManagement;
         private Button btnTransportManagement;
         private Button btnReports;
-        private Button btnUserProfile;
         private GroupBox groupBoxQuickActions;
         private Button btnViewRecentActivity;
         private Button btnRefresh;

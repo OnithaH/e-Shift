@@ -32,7 +32,6 @@
             lblTotalJobs = new Label();
             groupBoxActions = new GroupBox();
             btnLogout = new Button();
-            btnEditProfile = new Button();
             btnNewJobRequest = new Button();
             groupBoxRecentJobs = new GroupBox();
             dataGridViewJobs = new DataGridView();
@@ -189,7 +188,6 @@
             // groupBoxActions
             // 
             groupBoxActions.Controls.Add(btnLogout);
-            groupBoxActions.Controls.Add(btnEditProfile);
             groupBoxActions.Controls.Add(btnNewJobRequest);
             groupBoxActions.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
             groupBoxActions.Location = new Point(429, 170);
@@ -203,25 +201,13 @@
             // 
             btnLogout.BackColor = Color.LightPink;
             btnLogout.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            btnLogout.Location = new Point(20, 121);
+            btnLogout.Location = new Point(20, 80);
             btnLogout.Name = "btnLogout";
             btnLogout.Size = new Size(327, 38);
             btnLogout.TabIndex = 3;
             btnLogout.Text = "Logout";
             btnLogout.UseVisualStyleBackColor = false;
             btnLogout.Click += btnLogout_Click;
-            // 
-            // btnEditProfile
-            // 
-            btnEditProfile.BackColor = Color.LightYellow;
-            btnEditProfile.Font = new Font("Segoe UI", 10F);
-            btnEditProfile.Location = new Point(20, 80);
-            btnEditProfile.Name = "btnEditProfile";
-            btnEditProfile.Size = new Size(327, 35);
-            btnEditProfile.TabIndex = 2;
-            btnEditProfile.Text = "👤 Edit Profile";
-            btnEditProfile.UseVisualStyleBackColor = false;
-            btnEditProfile.Click += btnEditProfile_Click;
             // 
             // btnNewJobRequest
             // 
@@ -317,7 +303,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.GroupBox groupBoxActions;
         private System.Windows.Forms.Button btnNewJobRequest;
-        private System.Windows.Forms.Button btnEditProfile;
         private System.Windows.Forms.Button btnLogout;
         private System.Windows.Forms.GroupBox groupBoxRecentJobs;
         private System.Windows.Forms.DataGridView dataGridViewJobs;

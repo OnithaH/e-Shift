@@ -50,6 +50,8 @@ namespace e_Shift
 
         private void TransportUnitManagementForm_Load(object sender, EventArgs e)
         {
+            numCapacity.Maximum = 10000;
+            LoadComboBoxData();
             LoadAllData();
             SetupForm();
         }
@@ -67,7 +69,7 @@ namespace e_Shift
             LoadDrivers();
             LoadAssistants();
             LoadContainers();
-            LoadComboBoxData();
+            
         }
 
         private void ClearAllForms()
@@ -1802,13 +1804,37 @@ namespace e_Shift
                 {
                     if (reader != null && reader.Read())
                     {
-                        txtUnitNumber.Text = reader["UnitNumber"].ToString();
-                        cmbStatusTU.Text = reader["Status"].ToString();
-                        cmbLorryTU.SelectedValue = reader["LorryID"];
-                        cmbDriverTU.SelectedValue = reader["DriverID"];
-                        cmbAssistantTU.SelectedValue = reader["AssistantID"];
-                        cmbContainerTU.SelectedValue = reader["ContainerID"];
-                        chkIsAvailableUnit.Checked = Convert.ToBoolean(reader["IsAvailable"]);
+                        txtUnitNumber.Text = reader["UnitNumber"]?.ToString() ?? "";
+
+                        // Set status using Text property instead of SelectedValue
+                        string status = reader["Status"]?.ToString();
+                        if (!string.IsNullOrEmpty(status))
+                        {
+                            cmbStatusTU.Text = status;
+                        }
+
+                        // Set combo box values with null checking
+                        if (reader["LorryID"] != DBNull.Value)
+                        {
+                            cmbLorryTU.SelectedValue = Convert.ToInt32(reader["LorryID"]);
+                        }
+
+                        if (reader["DriverID"] != DBNull.Value)
+                        {
+                            cmbDriverTU.SelectedValue = Convert.ToInt32(reader["DriverID"]);
+                        }
+
+                        if (reader["AssistantID"] != DBNull.Value)
+                        {
+                            cmbAssistantTU.SelectedValue = Convert.ToInt32(reader["AssistantID"]);
+                        }
+
+                        if (reader["ContainerID"] != DBNull.Value)
+                        {
+                            cmbContainerTU.SelectedValue = Convert.ToInt32(reader["ContainerID"]);
+                        }
+
+                        chkIsAvailableUnit.Checked = Convert.ToBoolean(reader["IsAvailable"] ?? false);
                     }
                 }
             }
@@ -1834,5 +1860,8 @@ namespace e_Shift
             }
         }
         #endregion
+
+
+
     }
 }
