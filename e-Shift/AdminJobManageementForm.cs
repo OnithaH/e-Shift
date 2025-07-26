@@ -664,42 +664,95 @@ namespace e_Shift
         {
             try
             {
-                string query = @"
-                    UPDATE Jobs 
-                    SET Status = @Status,
-                        LastUpdatedByAdminID = @AdminID,
-                        LastUpdatedDate = @UpdateDate,
-                        ModifiedDate = @UpdateDate";
-
-                // Set completion date if completing the job
-                if (newStatus == "Completed")
+                // Start database transaction for multiple updates
+                using (var connection = new SqlConnection(DatabaseConnection.GetConnectionString()))
                 {
-                    query += ", CompletionDate = @CompletionDate";
+                    connection.Open();
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            // Update job status
+                            string updateJobQuery = @"
+                        UPDATE Jobs 
+                        SET Status = @Status, 
+                            ModifiedDate = @ModifiedDate";
+
+                            // Add completion date if job is being completed
+                            if (newStatus == "Completed")
+                            {
+                                updateJobQuery += ", CompletionDate = @CompletionDate";
+                            }
+
+                            updateJobQuery += " WHERE JobID = @JobID";
+
+                            using (var cmd = new SqlCommand(updateJobQuery, connection, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("@Status", newStatus);
+                                cmd.Parameters.AddWithValue("@ModifiedDate", DateTime.Now);
+                                cmd.Parameters.AddWithValue("@JobID", jobId);
+
+                                if (newStatus == "Completed")
+                                {
+                                    cmd.Parameters.AddWithValue("@CompletionDate", DateTime.Now);
+                                }
+
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            // CRITICAL FIX: Release transport unit when job is completed
+                            if (newStatus == "Completed")
+                            {
+                                string releaseTransportUnitQuery = @"
+                            UPDATE TransportUnits 
+                            SET Status = 'Available', 
+                                IsAvailable = 1, 
+                                CompletionDate = @CompletionDate,
+                                ModifiedDate = @ModifiedDate
+                            WHERE TransportUnitID = (
+                                SELECT TransportUnitID 
+                                FROM Jobs 
+                                WHERE JobID = @JobID
+                            )";
+
+                                using (var cmd = new SqlCommand(releaseTransportUnitQuery, connection, transaction))
+                                {
+                                    cmd.Parameters.AddWithValue("@CompletionDate", DateTime.Now);
+                                    cmd.Parameters.AddWithValue("@ModifiedDate", DateTime.Now);
+                                    cmd.Parameters.AddWithValue("@JobID", jobId);
+                                    cmd.ExecuteNonQuery();
+                                }
+
+                                // Also update Load status
+                                string updateLoadQuery = @"
+                            UPDATE Loads 
+                            SET Status = 'Completed', 
+                                ModifiedDate = @ModifiedDate
+                            WHERE JobID = @JobID";
+
+                                using (var cmd = new SqlCommand(updateLoadQuery, connection, transaction))
+                                {
+                                    cmd.Parameters.AddWithValue("@ModifiedDate", DateTime.Now);
+                                    cmd.Parameters.AddWithValue("@JobID", jobId);
+                                    cmd.ExecuteNonQuery();
+                                }
+                            }
+
+                            // Commit transaction
+                            transaction.Commit();
+
+                            // Log the action
+                            LogJobAction(jobId, "Status_Updated", $"Job status updated to {newStatus}");
+
+                            return true;
+                        }
+                        catch
+                        {
+                            transaction.Rollback();
+                            throw;  // FIXED: Just 'throw' instead of 'throw ex;'
+                        }
+                    }
                 }
-
-                query += " WHERE JobID = @JobID";
-
-                var parameterList = new List<SqlParameter>
-                {
-                    new SqlParameter("@Status", newStatus),
-                    new SqlParameter("@AdminID", UserSession.UserId),
-                    new SqlParameter("@UpdateDate", DateTime.Now),
-                    new SqlParameter("@JobID", jobId)
-                };
-
-                if (newStatus == "Completed")
-                {
-                    parameterList.Add(new SqlParameter("@CompletionDate", DateTime.Now));
-                }
-
-                int result = DatabaseConnection.ExecuteNonQuery(query, parameterList.ToArray());
-
-                if (result > 0)
-                {
-                    LogJobAction(jobId, "Job_StatusUpdate", $"Status updated to {newStatus}");
-                    return true;
-                }
-                return false;
             }
             catch (Exception ex)
             {

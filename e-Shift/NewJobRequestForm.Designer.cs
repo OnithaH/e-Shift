@@ -49,6 +49,8 @@
             lblSelectProducts = new Label();
             dgvProductSelection = new DataGridView();
             groupBoxCalculatedTotals = new GroupBox();
+            label1 = new Label();
+            lblDistanceValue = new Label();
             lblTotalWeight = new Label();
             lblWeightValue = new Label();
             lblTotalVolume = new Label();
@@ -393,6 +395,8 @@
             // 
             // groupBoxCalculatedTotals
             // 
+            groupBoxCalculatedTotals.Controls.Add(label1);
+            groupBoxCalculatedTotals.Controls.Add(lblDistanceValue);
             groupBoxCalculatedTotals.Controls.Add(lblTotalWeight);
             groupBoxCalculatedTotals.Controls.Add(lblWeightValue);
             groupBoxCalculatedTotals.Controls.Add(lblTotalVolume);
@@ -402,10 +406,32 @@
             groupBoxCalculatedTotals.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             groupBoxCalculatedTotals.Location = new Point(30, 740);
             groupBoxCalculatedTotals.Name = "groupBoxCalculatedTotals";
-            groupBoxCalculatedTotals.Size = new Size(660, 60);
+            groupBoxCalculatedTotals.Size = new Size(1015, 60);
             groupBoxCalculatedTotals.TabIndex = 8;
             groupBoxCalculatedTotals.TabStop = false;
             groupBoxCalculatedTotals.Text = "💰 Calculated Totals";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 10F);
+            label1.Location = new Point(441, 26);
+            label1.Name = "label1";
+            label1.Size = new Size(120, 23);
+            label1.TabIndex = 6;
+            label1.Text = "Total Distance:";
+            label1.Click += label1_Click;
+            // 
+            // lblDistanceValue
+            // 
+            lblDistanceValue.AutoSize = true;
+            lblDistanceValue.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblDistanceValue.ForeColor = Color.DarkBlue;
+            lblDistanceValue.Location = new Point(558, 26);
+            lblDistanceValue.Name = "lblDistanceValue";
+            lblDistanceValue.Size = new Size(51, 23);
+            lblDistanceValue.TabIndex = 7;
+            lblDistanceValue.Text = "0 km";
             // 
             // lblTotalWeight
             // 
@@ -432,7 +458,7 @@
             // 
             lblTotalVolume.AutoSize = true;
             lblTotalVolume.Font = new Font("Segoe UI", 10F);
-            lblTotalVolume.Location = new Point(200, 30);
+            lblTotalVolume.Location = new Point(232, 30);
             lblTotalVolume.Name = "lblTotalVolume";
             lblTotalVolume.Size = new Size(113, 23);
             lblTotalVolume.TabIndex = 2;
@@ -443,7 +469,7 @@
             lblVolumeValue.AutoSize = true;
             lblVolumeValue.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             lblVolumeValue.ForeColor = Color.DarkBlue;
-            lblVolumeValue.Location = new Point(310, 30);
+            lblVolumeValue.Location = new Point(342, 30);
             lblVolumeValue.Name = "lblVolumeValue";
             lblVolumeValue.Size = new Size(48, 23);
             lblVolumeValue.TabIndex = 3;
@@ -453,7 +479,7 @@
             // 
             lblEstimatedCost.AutoSize = true;
             lblEstimatedCost.Font = new Font("Segoe UI", 10F);
-            lblEstimatedCost.Location = new Point(400, 30);
+            lblEstimatedCost.Location = new Point(777, 33);
             lblEstimatedCost.Name = "lblEstimatedCost";
             lblEstimatedCost.Size = new Size(128, 23);
             lblEstimatedCost.TabIndex = 4;
@@ -464,7 +490,7 @@
             lblCostValue.AutoSize = true;
             lblCostValue.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
             lblCostValue.ForeColor = Color.DarkGreen;
-            lblCostValue.Location = new Point(530, 27);
+            lblCostValue.Location = new Point(907, 30);
             lblCostValue.Name = "lblCostValue";
             lblCostValue.Size = new Size(65, 28);
             lblCostValue.TabIndex = 5;
@@ -548,5 +574,7 @@
         private System.Windows.Forms.Label lblWeightValue;
         private System.Windows.Forms.Label lblVolumeValue;
         private System.Windows.Forms.Label lblCostValue;
+        private Label label1;
+        private Label lblDistanceValue;
     }
 }

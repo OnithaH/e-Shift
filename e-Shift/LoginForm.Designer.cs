@@ -39,6 +39,7 @@
             btnExit = new Button();
             lblStatus = new Label();
             groupBoxLoginType = new GroupBox();
+            btnRegister = new Button();
             groupBoxLoginType.SuspendLayout();
             SuspendLayout();
             // 
@@ -101,6 +102,7 @@
             rbCustomer.TabStop = true;
             rbCustomer.Text = "Customer Login";
             rbCustomer.UseVisualStyleBackColor = true;
+            rbCustomer.CheckedChanged += rbCustomer_CheckedChanged_1;
             // 
             // rbAdmin
             // 
@@ -114,7 +116,7 @@
             // 
             // btnLogin
             // 
-            btnLogin.Location = new Point(94, 312);
+            btnLogin.Location = new Point(51, 312);
             btnLogin.Name = "btnLogin";
             btnLogin.Size = new Size(122, 44);
             btnLogin.TabIndex = 7;
@@ -124,7 +126,7 @@
             // 
             // btnExit
             // 
-            btnExit.Location = new Point(278, 312);
+            btnExit.Location = new Point(228, 312);
             btnExit.Name = "btnExit";
             btnExit.Size = new Size(122, 44);
             btnExit.TabIndex = 8;
@@ -152,11 +154,22 @@
             groupBoxLoginType.TabStop = false;
             groupBoxLoginType.Text = "Login Type";
             // 
+            // btnRegister
+            // 
+            btnRegister.Location = new Point(388, 312);
+            btnRegister.Name = "btnRegister";
+            btnRegister.Size = new Size(122, 44);
+            btnRegister.TabIndex = 11;
+            btnRegister.Text = "Register";
+            btnRegister.UseVisualStyleBackColor = true;
+            btnRegister.Click += btnRegister_Click;
+            // 
             // LoginForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(588, 471);
+            Controls.Add(btnRegister);
             Controls.Add(groupBoxLoginType);
             Controls.Add(lblStatus);
             Controls.Add(btnExit);
@@ -188,5 +201,6 @@
         private Button btnExit;
         private Label lblStatus;
         private GroupBox groupBoxLoginType;
+        private Button btnRegister;
     }
 }

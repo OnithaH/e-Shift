@@ -151,34 +151,90 @@ namespace e_Shift
             {
                 decimal totalWeight = 0;
                 decimal totalVolume = 0;
-                decimal totalCost = 0;
+                decimal totalProductCost = 0;
+                decimal totalDistance = 0;
+                int selectedProductCount = 0;
 
+                // Calculate product costs
                 foreach (DataGridViewRow row in dgvProductSelection.Rows)
                 {
-                    bool isSelected = Convert.ToBoolean(row.Cells["Select"].Value);
-                    if (isSelected)
+                    if (Convert.ToBoolean(row.Cells["Select"].Value))
                     {
                         int quantity = Convert.ToInt32(row.Cells["Quantity"].Value);
-                        decimal weight = Convert.ToDecimal(row.Cells["Weight (kg)"].Value);
-                        decimal volume = Convert.ToDecimal(row.Cells["Volume (m³)"].Value);
-                        decimal pricePerUnit = Convert.ToDecimal(row.Cells["Price/Unit"].Value);
+                        if (quantity > 0)
+                        {
+                            decimal weight = Convert.ToDecimal(row.Cells["Weight (kg)"].Value);
+                            decimal volume = Convert.ToDecimal(row.Cells["Volume (m³)"].Value);
+                            decimal price = Convert.ToDecimal(row.Cells["Price/Unit"].Value);
 
-                        totalWeight += weight * quantity;
-                        totalVolume += volume * quantity;
-                        totalCost += pricePerUnit * quantity;
+                            totalWeight += weight * quantity;
+                            totalVolume += volume * quantity;
+                            totalProductCost += price * quantity;
+                            selectedProductCount++;
+                        }
                     }
                 }
 
-                // Apply priority multiplier
+                // Calculate distance and distance cost
+                decimal distanceCost = 0.00m;
+                if (!string.IsNullOrWhiteSpace(txtPickupCity.Text) && !string.IsNullOrWhiteSpace(txtDeliveryCity.Text))
+                {
+                    string pickup = txtPickupCity.Text.Trim().ToLower();
+                    string delivery = txtDeliveryCity.Text.Trim().ToLower();
+
+                    // Distance lookup table (kilometers)
+                    var distances = new Dictionary<string, decimal>
+            {
+                {"colombo-kandy", 115.8m},
+                {"colombo-gampaha", 35.2m},
+                {"colombo-negombo", 37.4m},
+                {"colombo-galle", 119.0m},
+                {"colombo-matara", 160.5m},
+                {"colombo-jaffna", 396.8m},
+                {"kandy-colombo", 115.8m},
+                {"gampaha-colombo", 35.2m},
+                {"negombo-colombo", 37.4m},
+                {"galle-colombo", 119.0m},
+                {"matara-colombo", 160.5m},
+                {"jaffna-colombo", 396.8m},
+                {"gampaha-kandy", 85.6m},
+                {"kandy-gampaha", 85.6m},
+                {"negombo-kandy", 142.3m},
+                {"kandy-negombo", 142.3m},
+                {"galle-kandy", 145.2m},
+                {"kandy-galle", 145.2m},
+                {"gampaha-negombo", 28.5m},
+                {"negombo-gampaha", 28.5m},
+                {"galle-matara", 41.3m},
+                {"matara-galle", 41.3m}
+            };
+
+                    string route = $"{pickup}-{delivery}";
+                    if (distances.ContainsKey(route))
+                    {
+                        totalDistance = distances[route];
+                        distanceCost = totalDistance * 2.5m; // $2.50 per km rate
+                    }
+                    else if (pickup != delivery) // Different cities but not in our database
+                    {
+                        totalDistance = 75.0m; // Default distance for unknown routes
+                        distanceCost = 187.50m; // Default cost (75km * $2.50)
+                    }
+                }
+
+                // Total cost = Product cost + Distance cost
+                decimal totalCost = totalProductCost + distanceCost;
+
+                // Apply priority multiplier to final total
                 decimal priorityMultiplier = 1.0m;
                 if (comboBoxPriority.Text == "High" || comboBoxPriority.Text == "Urgent")
                     priorityMultiplier = 1.5m;
-
                 totalCost *= priorityMultiplier;
 
-                // Update display
+                // Update display controls
                 lblWeightValue.Text = $"{totalWeight} kg";
                 lblVolumeValue.Text = $"{totalVolume} m³";
+                lblDistanceValue.Text = $"{totalDistance} km"; // Update distance display
                 lblCostValue.Text = $"${totalCost:F2}";
             }
             catch (Exception ex)
@@ -529,6 +585,11 @@ namespace e_Shift
         }
 
         private void lblCostValue_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
         {
 
         }

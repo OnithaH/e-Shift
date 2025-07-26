@@ -396,7 +396,8 @@ namespace e_Shift
                     {
                         System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
                         timer.Interval = 5000;
-                        timer.Tick += (s, e) => {
+                        timer.Tick += (s, e) =>
+                        {
                             if (lblStatus.ForeColor == System.Drawing.Color.Red)
                             {
                                 lblStatus.Text = "Ready to login";
@@ -420,6 +421,8 @@ namespace e_Shift
                 }
             }
         }
+
+
 
         private void ClearForm()
         {
@@ -449,6 +452,48 @@ namespace e_Shift
             // Clear session and reset form when activated
             UserSession.Logout();
             ClearForm();
+        }
+
+        private void rbCustomer_CheckedChanged_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnRegister_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Check if admin is selected
+                if (rbAdmin.Checked)
+                {
+                    ShowMessage("Admin registration is not available. Please contact system administrator.", true);
+                    return;
+                }
+
+                // Only allow customer registration
+                if (rbCustomer.Checked)
+                {
+                    CustomerRegistrationForm registerForm = new CustomerRegistrationForm();
+                    if (registerForm.ShowDialog() == DialogResult.OK)
+                    {
+                        ShowMessage("Registration completed successfully! You can now login with your credentials.", false);
+                        // Optionally clear the form and set focus
+                        txtUsername.Clear();
+                        txtPassword.Clear();
+                        rbCustomer.Checked = true;
+                        txtUsername.Focus();
+                    }
+                }
+                else
+                {
+                    ShowMessage("Please select Customer login type to register.", true);
+                    rbCustomer.Checked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error opening registration form: {ex.Message}", true);
+            }
         }
     }
 }

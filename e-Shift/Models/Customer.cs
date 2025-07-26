@@ -18,7 +18,6 @@ namespace e_Shift.Models
         public bool IsActive { get; set; }
         public DateTime? LastLogin { get; set; }
         public byte[] Password { get; set; }
-        public byte[] Salt { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
